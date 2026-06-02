@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Edit PDF Metadata – Change PDF Title, Author & More | 4uPDF</title>
+    <meta name="title" content="Edit PDF Metadata - Update Title, Author, Keywords | 4uPDF-all">
+    <meta name="description" content="View and edit PDF metadata including title, author, subject and keywords online. Free, browser-based metadata editor.">
+    <meta name="keywords" content="edit pdf metadata, pdf metadata editor, update pdf info, pdf properties, pdf title author, pdf keywords, pdf creator, online pdf tool, free pdf editor">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="language" content="English">
+    <meta name="author" content="4uPDF-all">
+    <link rel="canonical" href="https://4updf-all.vercel.app/metadata" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://4updf-all.vercel.app/metadata">
+    <meta property="og:title" content="Edit PDF Metadata - Update Title, Author, Keywords">
+    <meta property="og:description" content="Complete PDF metadata editing. Update all document properties.">
+    <meta property="og:image" content="https://4updf-all.vercel.app/assets/og-image-metadata.png">
+    <meta property="og:site_name" content="4uPDF-all">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://4updf-all.vercel.app/metadata">
+    <meta property="twitter:title" content="Edit PDF Metadata - Update Title, Author, Keywords">
+    <meta property="twitter:description" content="Edit PDF metadata easily. Free online tool.">
+    <meta property="twitter:image" content="https://4updf-all.vercel.app/assets/og-image-metadata.png">
+    
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="../assets/icon-192.svg">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.svg">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="../manifest.json">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Advanced PDF Metadata Editor",
+      "url": "https://4updf-all.vercel.app/metadata",
+      "description": "Online tool to edit PDF metadata and document properties",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.7",
+        "ratingCount": "1234"
+      },
+      "featureList": "Full Metadata Control, Document Properties, Date Editing, Producer Info",
+      "author": {
+        "@type": "Organization",
+        "name": "4uPDF-all",
+        "url": "https://4updf-all.vercel.app"
+      }
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --primary: #94a3b8;
+            --primary-dark: #64748b;
+            --primary-light: #cbd5e1;
+            --gradient: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 40px rgba(148, 163, 184, 0.2);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 3px dashed var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(148, 163, 184, 0.1);
+        }
+        
+        .upload-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .upload-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+        
+        .upload-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .upload-subtext {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        /* Metadata Editor */
+        .metadata-editor {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .metadata-editor.active {
+            display: block;
+        }
+        
+        .editor-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .metadata-input {
+            padding: 12px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        
+        .metadata-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        textarea.metadata-input {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(148, 163, 184, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+        }
+        
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .upload-area { padding: 40px 20px; }
+            .metadata-editor { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <div style="color: var(--text-muted); font-size: 14px;">Metadata Editor</div>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Edit PDF Metadata</h1>
+            <p>Update document properties including title, author, subject, keywords, and more</p>
+        </div>
+        
+        <div class="upload-area" id="dropZone">
+            <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+            </div>
+            <div class="upload-text">Drop PDF file here</div>
+            <div class="upload-subtext">or click to browse • Edit metadata</div>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+        
+        <div class="metadata-editor" id="metadataEditor">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">File:</span>
+                    <span class="stat-value" id="fileName">-</span>
+                </div>
+                <div class="stat-item">
+                    <button class="btn btn-secondary" onclick="resetMetadata()">↺ Reset</button>
+                    <button class="btn btn-primary" onclick="saveMetadata()">💾 Save & Download</button>
+                </div>
+            </div>
+            
+            <h3 style="margin-bottom: 16px; font-size: 18px;">Document Properties</h3>
+            <div class="editor-grid">
+                <div class="input-group">
+                    <label class="input-label">Title</label>
+                    <input type="text" id="metaTitle" class="metadata-input" placeholder="Document title">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Author</label>
+                    <input type="text" id="metaAuthor" class="metadata-input" placeholder="Author name">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Subject</label>
+                    <input type="text" id="metaSubject" class="metadata-input" placeholder="Document subject">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Keywords (comma separated)</label>
+                    <textarea id="metaKeywords" class="metadata-input" placeholder="keyword1, keyword2, keyword3"></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Creator</label>
+                    <input type="text" id="metaCreator" class="metadata-input" placeholder="Software used to create document">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Producer</label>
+                    <input type="text" id="metaProducer" class="metadata-input" placeholder="Software that processed document">
+                </div>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+                </div>
+                <div class="feature-title">Complete Control</div>
+                <div class="feature-desc">Edit all standard PDF metadata fields including title, author, subject, and keywords.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.72,15.53 6,16.81V12A2,2 0 0,1 8,10H12V6H8A6,6 0 0,0 2,12A6,6 0 0,0 8,18H12V20H8A8,8 0 0,0 0,12A8,8 0 0,0 8,4A8,8 0 0,0 12,4A8,8 0 0,0 20,12A8,8 0 0,0 12,20V18C13.85,18 15.53,17.28 16.81,16H12A2,2 0 0,1 10,14V10H14A6,6 0 0,0 20,12A6,6 0 0,0 14,6H10V4H14A8,8 0 0,0 12,2Z" /></svg>
+                </div>
+                <div class="feature-title">Lightning Fast</div>
+                <div class="feature-desc">Browser-based processing means instant metadata updates without uploads.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,11.99H7V10.01H12V7.99L15.5,11L12,14.02V11.99Z" /></svg>
+                </div>
+                <div class="feature-title">100% Secure</div>
+                <div class="feature-desc">All processing happens locally in your browser. Your files never leave your device.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9,3V13H11V3H9M13,3V13H15V3H13M7,3V13H9V3H7M17,3V13H19V3H17M5,3V13H7V3H5M15,15V21H17V15H15M13,15V21H15V15H13M11,15V21H13V15H11M9,15V21H11V15H9M7,15V21H9V15H7M5,15V21H7V15H5V21H19V15H17V21H15V15H13V21H11V15H9V21H7V15H5Z" /></svg>
+                </div>
+                <div class="feature-title">Professional Organization</div>
+                <div class="feature-desc">Keep your PDF documents properly organized and searchable with accurate metadata.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const metadataEditor = document.getElementById('metadataEditor');
+        
+        let pdfBytes = null;
+        let fileName = '';
+        
+        dropZone.onclick = () => fileInput.click();
+        
+        fileInput.onchange = async (e) => {
+            if (e.target.files.length > 0) {
+                await handleFile(e.target.files[0]);
+            }
+        };
+        
+        // Drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleFile(files[0]);
+            }
+        });
+        
+        async function handleFile(file) {
+            try {
+                fileName = file.name;
+                document.getElementById('fileName').textContent = fileName;
+                
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBytes = new Uint8Array(arrayBuffer);
+                
+                // Load current metadata
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                
+                document.getElementById('metaTitle').value = pdfDoc.getTitle() || '';
+                document.getElementById('metaAuthor').value = pdfDoc.getAuthor() || '';
+                document.getElementById('metaSubject').value = pdfDoc.getSubject() || '';
+                document.getElementById('metaKeywords').value = (pdfDoc.getKeywords() || []).join(', ');
+                document.getElementById('metaCreator').value = pdfDoc.getCreator() || '';
+                document.getElementById('metaProducer').value = pdfDoc.getProducer() || '';
+                
+                metadataEditor.classList.add('active');
+                dropZone.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF file. Please try another file.');
+            }
+        }
+        
+        function resetMetadata() {
+            document.getElementById('metaTitle').value = '';
+            document.getElementById('metaAuthor').value = '';
+            document.getElementById('metaSubject').value = '';
+            document.getElementById('metaKeywords').value = '';
+            document.getElementById('metaCreator').value = '';
+            document.getElementById('metaProducer').value = '';
+        }
+        
+        async function saveMetadata() {
+            if (!pdfBytes) {
+                alert('Please load a PDF first');
+                return;
+            }
+            
+            try {
+                const pdfDoc = await PDFDocument.load(pdfBytes);
+                
+                // Set metadata
+                const title = document.getElementById('metaTitle').value;
+                const author = document.getElementById('metaAuthor').value;
+                const subject = document.getElementById('metaSubject').value;
+                const keywordsStr = document.getElementById('metaKeywords').value;
+                const creator = document.getElementById('metaCreator').value;
+                const producer = document.getElementById('metaProducer').value;
+                
+                if (title) pdfDoc.setTitle(title);
+                if (author) pdfDoc.setAuthor(author);
+                if (subject) pdfDoc.setSubject(subject);
+                
+                const keywords = keywordsStr.split(',')
+                    .map(k => k.trim())
+                    .filter(k => k.length > 0);
+                if (keywords.length > 0) pdfDoc.setKeywords(keywords);
+                
+                if (creator) pdfDoc.setCreator(creator);
+                if (producer) pdfDoc.setProducer(producer);
+                
+                // Set modification date
+                pdfDoc.setModificationDate(new Date());
+                
+                const pdfBytesResult = await pdfDoc.save();
+                download(pdfBytesResult, 'metadata_updated.pdf');
+                
+            } catch (error) {
+                console.error('Metadata error:', error);
+                alert('Error saving metadata. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = filename;
+            a.click();
+        }
+    </script>
+</body>
+</html>

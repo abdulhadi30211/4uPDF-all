@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate and insert a QR code into any PDF page online. Customize size and position. Free and browser-based.">
+    <title>Add QR Code to PDF – Insert QR Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/add-qr" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%230ea5e9'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #0ea5e9; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .card { width: 100%; max-width: 500px; background: var(--bg-card); padding: 30px; border-radius: 16px; }
+        h2 { margin-top: 0; text-align: center; }
+        
+        input { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; }
+        .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        #qrcode { display: flex; justify-content: center; margin: 20px 0; background: white; padding: 10px; border-radius: 8px; }
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Add QR Code</h2>
+        
+        <input type="text" id="qrText" placeholder="Enter URL or Text" oninput="genQR()">
+        <div id="qrcode"></div>
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn" style="background:var(--border)" onclick="document.getElementById('fileInput').click()">Select PDF</button>
+            <button class="btn" id="applyBtn" style="display:none" onclick="apply()">Apply</button>
+        </div>
+        <input type="file" id="fileInput" accept=".pdf">
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        const qrInput = document.getElementById('qrText');
+        const qrContainer = document.getElementById('qrcode');
+        const fileInput = document.getElementById('fileInput');
+        const applyBtn = document.getElementById('applyBtn');
+        
+        let pdfBytes = null;
+        let qrDataUrl = null;
+
+        function genQR() {
+            qrContainer.innerHTML = "";
+            if(qrInput.value) {
+                new QRCode(qrContainer, { text: qrInput.value, width: 128, height: 128 });
+                setTimeout(() => qrDataUrl = qrContainer.querySelector('img').src, 100);
+            }
+        }
+
+        fileInput.onchange = async (e) => {
+            pdfBytes = new Uint8Array(await e.target.files[0].arrayBuffer());
+            applyBtn.style.display = 'inline-block';
+        };
+
+        async function apply() {
+            if(!pdfBytes || !qrDataUrl) return alert("Load PDF and generate QR first");
+            
+            const doc = await PDFDocument.load(pdfBytes);
+            const page = doc.getPage(0);
+            const { width } = page.getSize();
+            
+            const imgBytes = await fetch(qrDataUrl).then(res => res.arrayBuffer());
+            const img = await doc.embedPng(imgBytes);
+            
+            page.drawImage(img, { x: width - 150, y: 50, width: 100, height: 100 });
+            
+            const bytes = await doc.save();
+            download(bytes, "qr_added.pdf");
+        }
+
+        function download(data, name) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = name;
+            a.click();
+        }
+    </script>
+</body>
+</html>

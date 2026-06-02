@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to PDF – Convert TXT to PDF Online Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/text-to-pdf" />
+    <meta name="description" content="Convert plain text files to PDF documents online. Customize fonts and layout. Free, fast and no signup required.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%2364748b'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --accent: #64748b; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .container { padding: 40px; max-width: 800px; margin: 0 auto; }
+        textarea { width: 100%; height: 60vh; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 14px; padding: 20px; border-radius: 12px; resize: none; }
+        .btn { margin-top: 16px; padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; float: right; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">Back to Home</a><div>Text to PDF</div></header>
+    <div class="container">
+        <h1 style="margin-bottom:20px;">Paste Text</h1>
+        <textarea id="textArea" placeholder="Paste your text here..."></textarea>
+        <button class="btn" onclick="convert()">Convert to PDF</button>
+    </div>
+    <script>
+        const { PDFDocument, StandardFonts } = PDFLib;
+        
+        async function convert() {
+            const text = document.getElementById('textArea').value;
+            if(!text) return alert("Please enter some text");
+
+            const pdfDoc = await PDFDocument.create();
+            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            
+            // Simple page layout logic
+            const fontSize = 12;
+            const lineHeight = fontSize * 1.5;
+            const margin = 50;
+            const pageWidth = 600;
+            const pageHeight = 800;
+            const maxLines = Math.floor((pageHeight - margin * 2) / lineHeight);
+
+            // Split text into lines (basic wrap)
+            let lines = [];
+            const paragraphs = text.split('\n');
+            paragraphs.forEach(p => {
+                // Very basic wrapping logic
+                const words = p.split(' ');
+                let currentLine = '';
+                words.forEach(word => {
+                    const testLine = currentLine + word + ' ';
+                    if (font.widthOfTextAtSize(testLine, fontSize) > (pageWidth - margin * 2)) {
+                        lines.push(currentLine);
+                        currentLine = word + ' ';
+                    } else {
+                        currentLine = testLine;
+                    }
+                });
+                lines.push(currentLine);
+            });
+
+            // Create pages
+            for(let i = 0; i < lines.length; i += maxLines) {
+                const page = pdfDoc.addPage([pageWidth, pageHeight]);
+                const pageLines = lines.slice(i, i + maxLines);
+                
+                pageLines.forEach((line, idx) => {
+                    page.drawText(line, {
+                        x: margin,
+                        y: pageHeight - margin - (idx * lineHeight),
+                        size: fontSize,
+                        font: font,
+                        color: PDFLib.rgb(0, 0, 0),
+                    });
+                });
+            }
+
+            const bytes = await pdfDoc.save();
+            download(bytes, "text.pdf");
+        }
+
+        function download(data, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data])); a.download = name; a.click(); }
+    </script>
+</body>
+</html>

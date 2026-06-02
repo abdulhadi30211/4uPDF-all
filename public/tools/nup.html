@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-Up PDF – Print Multiple Pages per Sheet Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="Arrange multiple PDF pages onto one sheet (2-up, 4-up, 6-up). Save paper with multi-page layouts. Free and browser-based.">
+    <meta name="keywords" content="n-up pdf, multiple pages per sheet, pdf booklet, handout creator, pdf layout tool, save paper pdf, free pdf n-up">
+    <link rel="canonical" href="https://4updf-all.vercel.app/nup" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="N-Up PDF - Multiple Pages Per Sheet">
+    <meta property="og:description" content="Put 2, 4, 6, 8 or more pages on one sheet. Perfect for booklets and handouts.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://4updf-all.com/assets/nup-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23ec4899'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #ec4899;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+        
+        .upload-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: rgba(236, 72, 153, 0.05);
+        }
+        
+        .upload-box.dragover {
+            border-color: var(--accent);
+            background: rgba(236, 72, 153, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn-main {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+        }
+        
+        .controls-panel {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        label {
+            color: var(--muted);
+            font-weight: 600;
+        }
+        
+        select, input[type="number"] {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .page-thumb {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: move;
+            transition: all 0.3s;
+        }
+        
+        .page-thumb:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+        
+        .page-thumb img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            background: white;
+        }
+        
+        .page-num {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        
+        .stats-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .feature-desc {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .preview-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <button class="btn-main" onclick="generateNUp()">Generate N-Up PDF</button>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>N-Up PDF Creator</h1>
+            <p class="subtitle">Put multiple pages on one sheet • Save paper • Create booklets</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-box" id="dropZone">
+                <div class="upload-icon">📄</div>
+                <h2>Upload PDF for N-Up Layout</h2>
+                <p style="color: var(--muted); margin: 15px 0;">Drag & drop or click to browse</p>
+                <button class="btn-main">Select PDF File</button>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading PDF...</p>
+        </div>
+        
+        <div class="controls-panel" id="controlsPanel">
+            <div class="control-grid">
+                <div class="control-group">
+                    <label>Pages Per Sheet:</label>
+                    <select id="pagesPerSheet">
+                        <option value="2">2 pages (2-up)</option>
+                        <option value="4" selected>4 pages (4-up)</option>
+                        <option value="6">6 pages (6-up)</option>
+                        <option value="8">8 pages (8-up)</option>
+                        <option value="9">9 pages (9-up)</option>
+                        <option value="12">12 pages (12-up)</option>
+                        <option value="16">16 pages (16-up)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Layout Direction:</label>
+                    <select id="layoutDirection">
+                        <option value="horizontal">Horizontal (Left to Right)</option>
+                        <option value="vertical">Vertical (Top to Bottom)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Page Order:</label>
+                    <select id="pageOrder">
+                        <option value="normal">Normal Order</option>
+                        <option value="reverse">Reverse Order</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Spacing Between Pages:</label>
+                    <input type="number" id="spacing" value="10" min="0" max="50">
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-grid" id="previewGrid"></div>
+        
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalPages">0</div>
+                <div class="stat-label">Total Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="outputSheets">0</div>
+                <div class="stat-label">Output Sheets</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="paperSaved">0%</div>
+                <div class="stat-label">Paper Saved</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h3 class="feature-title">Booklet Creation</h3>
+                <p class="feature-desc">Perfect for creating booklets, handouts, and study materials. Arrange multiple pages efficiently.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">♻️</div>
+                <h3 class="feature-title">Save Paper</h3>
+                <p class="feature-desc">Reduce paper consumption by printing multiple pages per sheet. Eco-friendly and cost-effective.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Flexible Layouts</h3>
+                <p class="feature-desc">Choose from 2-up to 16-up layouts. Customize spacing, order, and direction for perfect results.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">100% Secure</h3>
+                <p class="feature-desc">Your PDFs never leave your browser. All processing happens locally on your device. Zero privacy risks.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const controlsPanel = document.getElementById('controlsPanel');
+        const previewGrid = document.getElementById('previewGrid');
+        const statsBar = document.getElementById('statsBar');
+        const loading = document.getElementById('loading');
+        
+        let pdfBytes = null;
+        let pageOrder = [];
+        
+        setupDropZone();
+        
+        function setupDropZone() {
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            dropZone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'application/pdf') {
+                    handleFile(files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+        }
+        
+        async function handleFile(file) {
+            try {
+                loading.style.display = 'block';
+                dropZone.style.display = 'none';
+                
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBytes = new Uint8Array(arrayBuffer);
+                
+                const pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                pageOrder = Array.from({ length: pdfDoc.numPages }, (_, i) => i);
+                
+                await renderThumbs(pdfDoc);
+                
+                controlsPanel.style.display = 'grid';
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF. Please try again.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function renderThumbs(pdfDoc) {
+            previewGrid.innerHTML = '';
+            
+            for (const idx of pageOrder) {
+                const page = await pdfDoc.getPage(idx + 1);
+                const viewport = page.getViewport({ scale: 0.25 });
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({
+                    canvasContext: canvas.getContext('2d'),
+                    viewport
+                }).promise;
+                
+                const thumb = document.createElement('div');
+                thumb.className = 'page-thumb';
+                thumb.draggable = true;
+                thumb.dataset.idx = idx;
+                thumb.innerHTML = `
+                    <img src="${canvas.toDataURL()}" alt="Page ${idx + 1}">
+                    <div class="page-num">Page ${idx + 1}</div>
+                `;
+                
+                addDragEvents(thumb, pdfDoc);
+                previewGrid.appendChild(thumb);
+            }
+        }
+        
+        function addDragEvents(thumb, pdfDoc) {
+            thumb.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', thumb.dataset.idx);
+                thumb.style.opacity = '0.5';
+            });
+            
+            thumb.addEventListener('dragend', () => {
+                thumb.style.opacity = '1';
+            });
+            
+            thumb.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            thumb.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+                const toIdx = parseInt(thumb.dataset.idx);
+                
+                const fromIndex = pageOrder.indexOf(fromIdx);
+                const toIndex = pageOrder.indexOf(toIdx);
+                
+                const item = pageOrder.splice(fromIndex, 1)[0];
+                pageOrder.splice(toIndex, 0, item);
+                
+                renderThumbs(pdfDoc);
+                updateStats();
+            });
+        }
+        
+        function updateStats() {
+            const total = pageOrder.length;
+            const pagesPerSheet = parseInt(document.getElementById('pagesPerSheet').value);
+            const outputSheets = Math.ceil(total / pagesPerSheet);
+            const paperSaved = ((1 - (outputSheets / total)) * 100).toFixed(1);
+            
+            document.getElementById('totalPages').textContent = total;
+            document.getElementById('outputSheets').textContent = outputSheets;
+            document.getElementById('paperSaved').textContent = `${paperSaved}%`;
+        }
+        
+        document.getElementById('pagesPerSheet').addEventListener('change', updateStats);
+        
+        async function generateNUp() {
+            if (!pdfBytes) {
+                alert('Please load a PDF first');
+                return;
+            }
+            
+            try {
+                const pagesPerSheet = parseInt(document.getElementById('pagesPerSheet').value);
+                const layoutDirection = document.getElementById('layoutDirection').value;
+                const pageOrderSetting = document.getElementById('pageOrder').value;
+                const spacing = parseInt(document.getElementById('spacing').value);
+                
+                const srcDoc = await PDFDocument.load(pdfBytes);
+                const newDoc = await PDFDocument.create();
+                
+                const pageWidth = srcDoc.getPage(0).getWidth();
+                const pageHeight = srcDoc.getPage(0).getHeight();
+                
+                let cols, rows;
+                if (layoutDirection === 'horizontal') {
+                    cols = pagesPerSheet <= 4 ? 2 : 3;
+                    rows = Math.ceil(pagesPerSheet / cols);
+                } else {
+                    rows = pagesPerSheet <= 4 ? 2 : 3;
+                    cols = Math.ceil(pagesPerSheet / rows);
+                }
+                
+                const availableWidth = pageWidth * cols - spacing * (cols - 1);
+                const availableHeight = pageHeight * rows - spacing * (rows - 1);
+                
+                const scaleFactor = Math.min(
+                    availableWidth / (pageWidth * cols),
+                    availableHeight / (pageHeight * rows)
+                );
+                
+                const scaledPageWidth = pageWidth * scaleFactor;
+                const scaledPageHeight = pageHeight * scaleFactor;
+                
+                let orderToUse = [...pageOrder];
+                if (pageOrderSetting === 'reverse') {
+                    orderToUse.reverse();
+                }
+                
+                for (let i = 0; i < orderToUse.length; i += pagesPerSheet) {
+                    const newPage = newDoc.addPage([pageWidth * cols, pageHeight * rows]);
+                    
+                    for (let j = 0; j < pagesPerSheet; j++) {
+                        if (i + j >= orderToUse.length) break;
+                        
+                        const srcIdx = orderToUse[i + j];
+                        const [embedded] = await newDoc.copyPages(srcDoc, [srcIdx]);
+                        
+                        let col, row;
+                        if (layoutDirection === 'horizontal') {
+                            col = j % cols;
+                            row = Math.floor(j / cols);
+                        } else {
+                            row = j % rows;
+                            col = Math.floor(j / rows);
+                        }
+                        
+                        const x = col * (scaledPageWidth + spacing);
+                        const y = pageHeight * rows - (row + 1) * (scaledPageHeight + spacing);
+                        
+                        newPage.drawPage(embedded, {
+                            x: x,
+                            y: y,
+                            width: scaledPageWidth,
+                            height: scaledPageHeight
+                        });
+                    }
+                }
+                
+                const pdfBytesResult = await newDoc.save();
+                download(pdfBytesResult, 'nup_layout.pdf');
+                
+            } catch (error) {
+                console.error('N-Up generation error:', error);
+                alert('Error generating N-Up PDF. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

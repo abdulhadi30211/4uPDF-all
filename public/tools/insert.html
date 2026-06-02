@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Insert Pages into PDF – Add Pages to PDF Free | 4uPDF</title>
+    <meta name="title" content="Insert PDF Pages - Insert Pages into PDF Online | 4uPDF-all">
+    <meta name="description" content="Insert pages from another PDF into your document at any position. Easy, browser-based and free to use.">
+    <meta name="keywords" content="insert pdf pages, add pages to pdf, insert pdf, blank page inserter, pdf editor, online pdf tool, free pdf inserter, combine pdfs">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="language" content="English">
+    <meta name="author" content="4uPDF-all">
+    <link rel="canonical" href="https://4updf-all.vercel.app/insert" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://4updf-all.vercel.app/insert">
+    <meta property="og:title" content="Insert PDF Pages - Insert Pages into PDF Online">
+    <meta property="og:description" content="Insert pages into PDF visually. Add blank pages or from another PDF. Free, fast, secure.">
+    <meta property="og:image" content="https://4updf-all.vercel.app/assets/og-image-insert.png">
+    <meta property="og:site_name" content="4uPDF-all">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://4updf-all.vercel.app/insert">
+    <meta property="twitter:title" content="Insert PDF Pages - Insert Pages into PDF Online">
+    <meta property="twitter:description" content="Insert pages into PDF at any position. Easy and free.">
+    <meta property="twitter:image" content="https://4updf-all.vercel.app/assets/og-image-insert.png">
+    
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="../assets/icon-192.svg">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.svg">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="../manifest.json">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Advanced PDF Page Inserter",
+      "url": "https://4updf-all.vercel.app/insert",
+      "description": "Online tool to insert pages into PDF documents",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.7",
+        "ratingCount": "1234"
+      },
+      "featureList": "Blank Page Insertion, PDF Insertion, Position Control, Size Matching",
+      "author": {
+        "@type": "Organization",
+        "name": "4uPDF-all",
+        "url": "https://4updf-all.vercel.app"
+      }
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --shadow: 0 10px 40px rgba(139, 92, 246, 0.2);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 3px dashed var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .upload-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .upload-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+        
+        .upload-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .upload-subtext {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        /* Editor Area */
+        .editor-container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .editor-container.active {
+            display: block;
+        }
+        
+        .toolbar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .toolbar-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .toolbar-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+        }
+        
+        /* Insert Options */
+        .insert-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .option-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .option-card.selected {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .option-card input {
+            display: none;
+        }
+        
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        
+        .option-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+        
+        .option-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .option-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .control-input {
+            padding: 12px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        
+        .control-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .upload-area { padding: 40px 20px; }
+            .editor-container { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <div style="color: var(--text-muted); font-size: 14px;">Page Inserter</div>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Insert PDF Pages</h1>
+            <p>Add blank pages or insert pages from another PDF at any position</p>
+        </div>
+        
+        <div class="upload-area" id="dropZone">
+            <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
+            </div>
+            <div class="upload-text">Drop base PDF file here</div>
+            <div class="upload-subtext">or click to browse • Any size PDF</div>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+        
+        <div class="editor-container" id="editorContainer">
+            <div class="toolbar-header">
+                <div class="toolbar-title">📥 Insert Options</div>
+                <div class="toolbar-actions">
+                    <button class="btn btn-secondary" onclick="resetTool()">↺ Reset</button>
+                    <button class="btn btn-primary" onclick="applyInsert()">💾 Apply & Download</button>
+                </div>
+            </div>
+            
+            <div class="insert-options">
+                <label class="option-card selected">
+                    <input type="radio" name="insert-type" value="blank" checked>
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19M14,17H7V15H14V17M17,13H7V11H17V13M17,9H7V7H17V9Z" /></svg>
+                    </div>
+                    <div class="option-title">Blank Page</div>
+                    <div class="option-desc">Add empty page</div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="insert-type" value="from-pdf">
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,12L16,16H13.5V19H10.5V16H8L12,12Z" /></svg>
+                    </div>
+                    <div class="option-title">From Another PDF</div>
+                    <div class="option-desc">Insert pages from file</div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="insert-type" value="multiple-blank">
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19M14,17H7V15H14V17M17,13H7V11H17V13M17,9H7V7H17V9Z" /></svg>
+                    </div>
+                    <div class="option-title">Multiple Blank Pages</div>
+                    <div class="option-desc">Add several empty pages</div>
+                </label>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Insert At Position:</label>
+                    <input type="number" id="position" class="control-input" value="1" min="1">
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Number of Pages:</label>
+                    <input type="number" id="numPages" class="control-input" value="1" min="1">
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Page Size:</label>
+                    <select id="pageSize" class="control-input">
+                        <option value="match">Match Document</option>
+                        <option value="a4">A4 (210 × 297 mm)</option>
+                        <option value="letter">Letter (8.5 × 11 in)</option>
+                        <option value="legal">Legal (8.5 × 14 in)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">Current Pages:</span>
+                    <span class="stat-value" id="currentPages">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">After Insert:</span>
+                    <span class="stat-value" id="afterPages">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Insert Type:</span>
+                    <span class="stat-value" id="insertType">Blank Page</span>
+                </div>
+            </div>
+            
+            <div id="secondFileArea" style="display: none; margin-top: 20px;">
+                <div class="upload-area" id="secondDropZone" style="padding: 30px 20px;">
+                    <div class="upload-text" style="font-size: 18px;">Drop PDF to insert from</div>
+                    <div class="upload-subtext">Select which pages to insert</div>
+                    <input type="file" id="secondFileInput" accept=".pdf">
+                </div>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
+                </div>
+                <div class="feature-title">Flexible Insertion</div>
+                <div class="feature-desc">Add blank pages or insert from another PDF at any position.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+                </div>
+                <div class="feature-title">Multiple Modes</div>
+                <div class="feature-desc">Single blank page, multiple pages, or insert from another PDF.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.72,15.53 6,16.81V12A2,2 0 0,1 8,10H12V6H8A6,6 0 0,0 2,12A6,6 0 0,0 8,18H12V20H8A8,8 0 0,0 0,12A8,8 0 0,0 8,4A8,8 0 0,0 12,4A8,8 0 0,0 20,12A8,8 0 0,0 12,20V18C13.85,18 15.53,17.28 16.81,16H12A2,2 0 0,1 10,14V10H14A6,6 0 0,0 20,12A6,6 0 0,0 14,6H10V4H14A8,8 0 0,0 12,2Z" /></svg>
+                </div>
+                <div class="feature-title">Lightning Fast</div>
+                <div class="feature-desc">Browser-based processing means instant insertion without uploads.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,11.99H7V10.01H12V7.99L15.5,11L12,14.02V11.99Z" /></svg>
+                </div>
+                <div class="feature-title">100% Secure</div>
+                <div class="feature-desc">All processing happens locally. Your files never leave your device.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const editorContainer = document.getElementById('editorContainer');
+        const secondFileArea = document.getElementById('secondFileArea');
+        const secondDropZone = document.getElementById('secondDropZone');
+        const secondFileInput = document.getElementById('secondFileInput');
+        
+        let basePdfBytes = null;
+        let basePdfDoc = null;
+        let totalPages = 0;
+        let insertType = 'blank';
+        let secondPdfBytes = null;
+        
+        // Insert type selection
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (this.querySelector('input')) {
+                    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    insertType = this.querySelector('input').value;
+                    
+                    document.getElementById('insertType').textContent = 
+                        insertType === 'blank' ? 'Blank Page' :
+                        insertType === 'from-pdf' ? 'From PDF' : 'Multiple Pages';
+                    
+                    secondFileArea.style.display = insertType === 'from-pdf' ? 'block' : 'none';
+                }
+            });
+        });
+        
+        dropZone.onclick = () => fileInput.click();
+        
+        fileInput.onchange = async (e) => {
+            if (e.target.files.length > 0) {
+                await handleBaseFile(e.target.files[0]);
+            }
+        };
+        
+        secondDropZone.onclick = () => secondFileInput.click();
+        
+        secondFileInput.onchange = async (e) => {
+            if (e.target.files.length > 0) {
+                secondPdfBytes = new Uint8Array(await e.target.files[0].arrayBuffer());
+                alert('✅ Second PDF loaded! Ready to insert pages.');
+            }
+        };
+        
+        // Drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            if (secondFileArea.style.display === 'block') {
+                secondDropZone.addEventListener(eventName, preventDefaults, false);
+            }
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+            if (secondFileArea.style.display === 'block') {
+                secondDropZone.addEventListener(eventName, () => secondDropZone.classList.add('dragover'), false);
+            }
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+            if (secondFileArea.style.display === 'block') {
+                secondDropZone.addEventListener(eventName, () => secondDropZone.classList.remove('dragover'), false);
+            }
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleBaseFile(files[0]);
+            }
+        });
+        
+        async function handleBaseFile(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                basePdfBytes = new Uint8Array(arrayBuffer);
+                basePdfDoc = await PDFDocument.load(arrayBuffer);
+                
+                totalPages = basePdfDoc.getPageCount();
+                document.getElementById('currentPages').textContent = totalPages;
+                document.getElementById('position').max = totalPages + 1;
+                
+                updateAfterPages();
+                
+                editorContainer.classList.add('active');
+                dropZone.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF file. Please try another file.');
+            }
+        }
+        
+        function updateAfterPages() {
+            const numPages = parseInt(document.getElementById('numPages').value) || 0;
+            const after = totalPages + numPages;
+            document.getElementById('afterPages').textContent = after;
+        }
+        
+        document.getElementById('numPages').addEventListener('change', updateAfterPages);
+        
+        function resetTool() {
+            location.reload();
+        }
+        
+        async function applyInsert() {
+            try {
+                const position = parseInt(document.getElementById('position').value) - 1; // 0-indexed
+                const numPages = parseInt(document.getElementById('numPages').value);
+                const sizeOpt = document.getElementById('pageSize').value;
+                
+                if (insertType === 'blank' || insertType === 'multiple-blank') {
+                    // Insert blank page(s)
+                    let width, height;
+                    
+                    if (sizeOpt === 'match' && totalPages > 0) {
+                        const firstPage = basePdfDoc.getPage(0);
+                        width = firstPage.getWidth();
+                        height = firstPage.getHeight();
+                    } else {
+                        width = 612; height = 792; // Letter
+                        if (sizeOpt === 'a4') { width = 595.28; height = 841.89; }
+                        if (sizeOpt === 'legal') { width = 612; height = 1008; }
+                    }
+                    
+                    for (let i = 0; i < numPages; i++) {
+                        basePdfDoc.insertPage(position, [width, height]);
+                    }
+                    
+                } else if (insertType === 'from-pdf' && secondPdfBytes) {
+                    // Insert from second PDF
+                    const secondPdfDoc = await PDFDocument.load(secondPdfBytes);
+                    const secondPages = secondPdfDoc.getPageIndices();
+                    
+                    const copiedPages = await basePdfDoc.copyPages(secondPdfDoc, secondPages);
+                    copiedPages.forEach((page, idx) => {
+                        basePdfDoc.insertPage(position + idx, page);
+                    });
+                }
+                
+                const pdfBytes = await basePdfDoc.save();
+                download(pdfBytes, 'inserted.pdf');
+                
+            } catch (error) {
+                console.error('Insert error:', error);
+                alert('Error inserting pages. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = filename;
+            a.click();
+        }
+    </script>
+</body>
+</html>

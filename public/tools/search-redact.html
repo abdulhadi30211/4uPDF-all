@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Search for specific text and redact it across your entire PDF. Bulk redaction, browser-based and free to use.">
+    <title>Search & Redact PDF – Find and Remove Text Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/search-redact" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23000000'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #ef4444; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .card { width: 100%; max-width: 500px; background: var(--bg-card); padding: 30px; border-radius: 16px; }
+        h2 { margin-top: 0; }
+        
+        input { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; }
+        .btn { padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        input[type="file"] { display: none; }
+        .count { margin-top: 10px; font-size: 12px; color: var(--muted); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Search & Redact</h2>
+        <p style="color:var(--muted)">Find text and black it out permanently.</p>
+        
+        <input type="text" id="searchTerm" placeholder="Word to hide (e.g. 'Secret')">
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn" style="background:var(--border)" onclick="document.getElementById('fileInput').click()">Select PDF</button>
+            <button class="btn" id="procBtn" style="display:none" onclick="redact()">Redact</button>
+        </div>
+        <input type="file" id="fileInput" accept=".pdf">
+        <div class="count" id="status"></div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument, rgb } = PDFLib;
+        
+        const fileInput = document.getElementById('fileInput');
+        const procBtn = document.getElementById('procBtn');
+        const status = document.getElementById('status');
+        
+        let pdfBytes = null;
+
+        fileInput.onchange = async (e) => {
+            pdfBytes = new Uint8Array(await e.target.files[0].arrayBuffer());
+            procBtn.style.display = 'inline-block';
+        };
+
+        async function redact() {
+            const term = document.getElementById('searchTerm').value.toLowerCase();
+            if(!term) return alert("Enter a word");
+            
+            status.textContent = "Scanning...";
+            
+            // We must flatten the PDF to image to ensure text is actually hidden.
+            // Otherwise, one can just copy paste text from under the black box.
+            // So the workflow is: Render Page -> Find Coords -> Draw Rect -> Embed as Image.
+            
+            const srcDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+            const newDoc = await PDFDocument.create();
+            
+            let count = 0;
+            
+            for(let i=1; i<=srcDoc.numPages; i++) {
+                const page = await srcDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width; canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport }).promise;
+                
+                // Find text items
+                const textContent = await page.getTextContent();
+                textContent.items.forEach(item => {
+                    if(item.str.toLowerCase().includes(term)) {
+                        count++;
+                        const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
+                        const x = tx[4];
+                        const y = tx[5];
+                        const w = item.width * viewport.scale;
+                        const h = item.height * viewport.scale;
+                        
+                        // Draw black box on canvas
+                        ctx.fillStyle = 'black';
+                        ctx.fillRect(x, y - (h * 0.2), w, h * 1.2);
+                    }
+                });
+                
+                // Embed modified canvas
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                const imgBytes = await fetch(imgData).then(res => res.arrayBuffer());
+                const img = await newDoc.embedJpg(imgBytes);
+                const newPage = newDoc.addPage([viewport.width, viewport.height]);
+                newPage.drawImage(img, { x:0, y:0, width: viewport.width, height: viewport.height });
+            }
+            
+            status.textContent = `Redacted ${count} instances.`;
+            const bytes = await newDoc.save();
+            download(bytes, "redacted_search.pdf");
+        }
+
+        function download(data, name) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = name;
+            a.click();
+        }
+    </script>
+</body>
+</html>

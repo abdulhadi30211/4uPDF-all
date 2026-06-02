@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Word to PDF Converter – Convert DOCX to PDF Free | 4uPDF</title>
+    <meta name="title" content="Word to PDF Converter - Convert DOCX to PDF Online | 4uPDF-all">
+    <meta name="description" content="Convert Word DOCX to PDF instantly with live preview. No server uploads, 100% browser-based, free and private.">
+    <meta name="keywords" content="word to pdf, convert word to pdf, docx to pdf, word converter, pdf converter, online word to pdf, free word converter, convert docx to pdf, online pdf converter, microsoft word to pdf">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="language" content="English">
+    <meta name="author" content="4uPDF-all">
+    <link rel="canonical" href="https://4updf-all.vercel.app/word-to-pdf" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://4updf-all.vercel.app/word-to-pdf">
+    <meta property="og:title" content="Word to PDF Converter - Convert DOCX to PDF Online">
+    <meta property="og:description" content="Convert Word DOCX to PDF online instantly with live preview. Browser-based processing with no server uploads. 100% free and secure.">
+    <meta property="og:image" content="https://4updf-all.vercel.app/assets/og-image-word-to-pdf.png">
+    <meta property="og:site_name" content="4uPDF-all">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://4updf-all.vercel.app/word-to-pdf">
+    <meta property="twitter:title" content="Word to PDF Converter - Convert DOCX to PDF Online">
+    <meta property="twitter:description" content="Convert Word DOCX to PDF online instantly with live preview. 100% free and secure.">
+    <meta property="twitter:image" content="https://4updf-all.vercel.app/assets/og-image-word-to-pdf.png">
+    
+    <!-- Favicon -->
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="../assets/icon-192.svg">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.svg">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="../manifest.json">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Word to PDF Converter",
+      "url": "https://4updf-all.vercel.app/word-to-pdf",
+      "description": "Online tool to convert Word DOCX files to PDF format",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "4uPDF-all",
+        "url": "https://4updf-all.vercel.app"
+      }
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #2563eb; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; display: flex; flex-direction: column; }
+        header { padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--bg-card); }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        
+        .container { flex: 1; display: flex; }
+        .sidebar { width: 300px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; }
+        .upload-box { border: 2px dashed var(--border); padding: 30px; text-align: center; cursor: pointer; border-radius: 8px; }
+        input { display: none; }
+        .btn { margin-top: 20px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; }
+        
+        .preview-area { flex: 1; background: #525659; overflow: auto; display: flex; justify-content: center; padding: 20px; }
+        .preview-content { background: white; width: 800px; min-height: 100%; padding: 60px; box-shadow: 0 0 20px rgba(0,0,0,0.5); color: black; font-family: 'Times New Roman', serif; }
+        h1 { font-size: 24px; margin-bottom: 15px; }
+        p { line-height: 1.6; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <div>Word to PDF Studio</div>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="upload-box" id="dropZone">
+                <p style="font-size:14px">Select .docx file</p>
+                <input type="file" id="fileInput" accept=".docx">
+            </div>
+            <div id="info" style="margin-top:20px; font-size:13px; color:var(--muted); display:none;">
+                <p><strong>File:</strong> <span id="fileName">-</span></p>
+                <p>Previewing converted content...</p>
+            </div>
+            <button class="btn" id="convertBtn" style="display:none" onclick="downloadPdf()">Download PDF</button>
+        </div>
+        
+        <div class="preview-area">
+            <div class="preview-content" id="renderArea">
+                <h2 style="text-align:center; color:#999;">Your document preview will appear here</h2>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const renderArea = document.getElementById('renderArea');
+        const convertBtn = document.getElementById('convertBtn');
+        
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+        async function handleFile(file) {
+            if(!file.name.endsWith('.docx')) return alert('Only .docx supported');
+            
+            document.getElementById('info').style.display = 'block';
+            document.getElementById('fileName').textContent = file.name;
+            dropZone.style.display = 'none';
+
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.convertToHtml({ arrayBuffer });
+            
+            renderArea.innerHTML = `
+                <div style="text-align:center; margin-bottom:30px; border-bottom:1px solid #ccc; padding-bottom:10px;">
+                    <h1>Word to PDF Converter</h1>
+                </div>
+                ${result.value}
+            `;
+            
+            convertBtn.style.display = 'block';
+        }
+
+        async function downloadPdf() {
+            const opt = {
+                margin: 10, filename: 'converted.pdf', image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            await html2pdf().set(opt).from(renderArea).save();
+        }
+    </script>
+</body>
+</html>

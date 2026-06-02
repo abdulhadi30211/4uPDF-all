@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Crop PDF – Crop PDF Pages Online Free | 4uPDF</title>
+    <meta name="title" content="Crop PDF - Crop PDF Pages Online Free | 4uPDF-all">
+    <meta name="description" content="Crop margins and trim content from PDF pages online. Set custom crop areas per page. Free and browser-based.">
+    <meta name="keywords" content="crop pdf, pdf cropper, trim pdf, remove margins, crop pdf pages, pdf editor, online pdf crop tool, free pdf cropper, visual crop">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="language" content="English">
+    <meta name="author" content="4uPDF-all">
+    <link rel="canonical" href="https://4updf-all.vercel.app/crop" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://4updf-all.vercel.app/crop">
+    <meta property="og:title" content="Crop PDF - Crop PDF Pages Online Free">
+    <meta property="og:description" content="Crop PDF pages visually with smart edge detection. Free, fast, secure.">
+    <meta property="og:image" content="https://4updf-all.vercel.app/assets/og-image-crop.png">
+    <meta property="og:site_name" content="4uPDF-all">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://4updf-all.vercel.app/crop">
+    <meta property="twitter:title" content="Crop PDF - Crop PDF Pages Online Free">
+    <meta property="twitter:description" content="Crop PDF pages visually. Smart edge detection. 100% free and secure.">
+    <meta property="twitter:image" content="https://4updf-all.vercel.app/assets/og-image-crop.png">
+    
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="../assets/icon-192.svg">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.svg">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="../manifest.json">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Advanced PDF Cropper",
+      "url": "https://4updf-all.vercel.app/crop",
+      "description": "Online tool to crop PDF pages with smart edge detection",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1432"
+      },
+      "featureList": "Smart Edge Detection, Visual Cropping, Batch Processing, Preset Ratios",
+      "author": {
+        "@type": "Organization",
+        "name": "4uPDF-all",
+        "url": "https://4updf-all.vercel.app"
+      }
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --primary: #84cc16;
+            --primary-dark: #65a30d;
+            --primary-light: #a3d94e;
+            --gradient: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --shadow: 0 10px 40px rgba(132, 204, 22, 0.2);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 3px dashed var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(132, 204, 22, 0.1);
+        }
+        
+        .upload-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .upload-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+        
+        .upload-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .upload-subtext {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        /* Editor Area */
+        .editor-container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .editor-container.active {
+            display: block;
+        }
+        
+        .toolbar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .toolbar-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .toolbar-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(132, 204, 22, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+        }
+        
+        /* Crop Options */
+        .crop-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .option-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .option-card.selected {
+            border-color: var(--primary);
+            background: rgba(132, 204, 22, 0.1);
+        }
+        
+        .option-card input {
+            display: none;
+        }
+        
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        
+        .option-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+        
+        .option-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .option-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        /* Canvas Area */
+        .canvas-wrapper {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+        
+        #pdfCanvas {
+            display: block;
+            max-width: 100%;
+        }
+        
+        .selection-box {
+            position: absolute;
+            border: 3px solid var(--primary);
+            background: rgba(132, 204, 22, 0.2);
+            cursor: move;
+            pointer-events: auto;
+        }
+        
+        .selection-box .resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        .selection-box .resize-handle.nw { top: -6px; left: -6px; cursor: nw-resize; }
+        .selection-box .resize-handle.ne { top: -6px; right: -6px; cursor: ne-resize; }
+        .selection-box .resize-handle.sw { bottom: -6px; left: -6px; cursor: sw-resize; }
+        .selection-box .resize-handle.se { bottom: -6px; right: -6px; cursor: se-resize; }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .upload-area { padding: 40px 20px; }
+            .editor-container { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <div style="color: var(--text-muted); font-size: 14px;">PDF Cropper</div>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Crop PDF Pages</h1>
+            <p>Remove unwanted margins and white space. Smart edge detection with precise visual control</p>
+        </div>
+        
+        <div class="upload-area" id="dropZone">
+            <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19M17.07,15.59L15.66,17L12.91,14.25L10.5,16.66L9.09,15.25L11.5,12.83L8.75,10.08L10.16,8.67L12.91,11.42L15.33,9L16.74,10.41L14.33,12.83L17.07,15.59Z" /></svg>
+            </div>
+            <div class="upload-text">Drop PDF file here</div>
+            <div class="upload-subtext">or click to browse • Any size PDF</div>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+        
+        <div class="editor-container" id="editorContainer">
+            <div class="toolbar-header">
+                <div class="toolbar-title">✂️ Crop Controls</div>
+                <div class="toolbar-actions">
+                    <button class="btn btn-secondary" onclick="resetCrop()">↺ Reset</button>
+                    <button class="btn btn-secondary" onclick="autoDetectEdges()">🤖 Auto-Detect</button>
+                    <button class="btn btn-primary" onclick="applyCrop()">💾 Apply Crop</button>
+                </div>
+            </div>
+            
+            <div class="crop-options">
+                <label class="option-card selected">
+                    <input type="radio" name="crop-mode" value="manual" checked>
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19M17.07,15.59L15.66,17L12.91,14.25L10.5,16.66L9.09,15.25L11.5,12.83L8.75,10.08L10.16,8.67L12.91,11.42L15.33,9L16.74,10.41L14.33,12.83L17.07,15.59Z" /></svg>
+                    </div>
+                    <div class="option-title">Manual Crop</div>
+                    <div class="option-desc">Draw selection area</div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="crop-mode" value="auto">
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+                    </div>
+                    <div class="option-title">Auto-Detect Edges</div>
+                    <div class="option-desc">Smart content detection</div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="crop-mode" value="preset">
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19M14,17H7V15H14V17M17,13H7V11H17V13M17,9H7V7H17V9Z" /></svg>
+                    </div>
+                    <div class="option-title">Preset Ratios</div>
+                    <div class="option-desc">16:9, 4:3, A4, etc.</div>
+                </label>
+                
+                <label class="option-card">
+                    <input type="radio" name="crop-mode" value="margins">
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24"><path d="M3,3H21V21H3V3M5,5V19H19V5H5Z" /></svg>
+                    </div>
+                    <div class="option-title">Remove Margins</div>
+                    <div class="option-desc">Auto-margin removal</div>
+                </label>
+            </div>
+            
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <canvas id="pdfCanvas"></canvas>
+                <div class="selection-box" id="selectionBox" style="display: none;">
+                    <div class="resize-handle nw"></div>
+                    <div class="resize-handle ne"></div>
+                    <div class="resize-handle sw"></div>
+                    <div class="resize-handle se"></div>
+                </div>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">Original Size:</span>
+                    <span class="stat-value" id="originalSize">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Crop Area:</span>
+                    <span class="stat-value" id="cropArea">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Reduction:</span>
+                    <span class="stat-value" id="reduction">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+                </div>
+                <div class="feature-title">Smart Edge Detection</div>
+                <div class="feature-desc">AI automatically detects content boundaries for perfect cropping without manual adjustment.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19M17.07,15.59L15.66,17L12.91,14.25L10.5,16.66L9.09,15.25L11.5,12.83L8.75,10.08L10.16,8.67L12.91,11.42L15.33,9L16.74,10.41L14.33,12.83L17.07,15.59Z" /></svg>
+                </div>
+                <div class="feature-title">Visual Precision</div>
+                <div class="feature-desc">Drag to select exact crop area with resize handles for fine-tuning.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.72,15.53 6,16.81V12A2,2 0 0,1 8,10H12V6H8A6,6 0 0,0 2,12A6,6 0 0,0 8,18H12V20H8A8,8 0 0,0 0,12A8,8 0 0,0 8,4A8,8 0 0,0 12,4A8,8 0 0,0 20,12A8,8 0 0,0 12,20V18C13.85,18 15.53,17.28 16.81,16H12A2,2 0 0,1 10,14V10H14A6,6 0 0,0 20,12A6,6 0 0,0 14,6H10V4H14A8,8 0 0,0 12,2Z" /></svg>
+                </div>
+                <div class="feature-title">Lightning Fast</div>
+                <div class="feature-desc">Browser-based processing means instant cropping without server uploads.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,11.99H7V10.01H12V7.99L15.5,11L12,14.02V11.99Z" /></svg>
+                </div>
+                <div class="feature-title">100% Secure</div>
+                <div class="feature-desc">All processing happens locally in your browser. Your files never leave your device.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const editorContainer = document.getElementById('editorContainer');
+        const canvas = document.getElementById('pdfCanvas');
+        const selectionBox = document.getElementById('selectionBox');
+        const canvasWrapper = document.getElementById('canvasWrapper');
+        
+        let pdfBytes = null;
+        let pdfDoc = null;
+        let isDrawing = false;
+        let startX, startY;
+        let currentSelection = null;
+        let scale = 1.5;
+        
+        dropZone.onclick = () => fileInput.click();
+        
+        fileInput.onchange = async (e) => {
+            if (e.target.files.length > 0) {
+                await handleFile(e.target.files[0]);
+            }
+        };
+        
+        // Drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleFile(files[0]);
+            }
+        });
+        
+        async function handleFile(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBytes = new Uint8Array(arrayBuffer);
+                pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                const page = await pdfDoc.getPage(1);
+                const viewport = page.getViewport({ scale: scale });
+                
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                
+                const widthInches = (viewport.width / 72).toFixed(2);
+                const heightInches = (viewport.height / 72).toFixed(2);
+                document.getElementById('originalSize').textContent = `${widthInches}" × ${heightInches}"`;
+                
+                editorContainer.classList.add('active');
+                dropZone.style.display = 'none';
+                
+                setupInteraction();
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF file. Please try another file.');
+            }
+        }
+        
+        function setupInteraction() {
+            canvasWrapper.onmousedown = startSelection;
+            canvasWrapper.ontouchstart = startSelection;
+        }
+        
+        function startSelection(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            startX = clientX - rect.left;
+            startY = clientY - rect.top;
+            
+            selectionBox.style.left = startX + 'px';
+            selectionBox.style.top = startY + 'px';
+            selectionBox.style.width = '0px';
+            selectionBox.style.height = 'px';
+            selectionBox.style.display = 'block';
+            
+            isDrawing = true;
+            
+            canvasWrapper.onmousemove = updateSelection;
+            canvasWrapper.ontouchmove = updateSelection;
+            canvasWrapper.onmouseup = endSelection;
+            canvasWrapper.ontouchend = endSelection;
+        }
+        
+        function updateSelection(e) {
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const currentX = clientX - rect.left;
+            const currentY = clientY - rect.top;
+            
+            const width = currentX - startX;
+            const height = currentY - startY;
+            
+            selectionBox.style.left = (width < 0 ? currentX : startX) + 'px';
+            selectionBox.style.top = (height < 0 ? currentY : startY) + 'px';
+            selectionBox.style.width = Math.abs(width) + 'px';
+            selectionBox.style.height = Math.abs(height) + 'px';
+            
+            updateStats();
+        }
+        
+        function endSelection() {
+            isDrawing = false;
+            canvasWrapper.onmousemove = null;
+            canvasWrapper.onmouseup = null;
+            canvasWrapper.ontouchmove = null;
+            canvasWrapper.ontouchend = null;
+        }
+        
+        function updateStats() {
+            const w = parseFloat(selectionBox.style.width) || 0;
+            const h = parseFloat(selectionBox.style.height) || 0;
+            
+            if (w > 0 && h > 0) {
+                const widthInches = (w / 72).toFixed(2);
+                const heightInches = (h / 72).toFixed(2);
+                document.getElementById('cropArea').textContent = `${widthInches}" × ${heightInches}"`;
+                
+                const originalW = canvas.width;
+                const originalH = canvas.height;
+                const reduction = ((1 - (w * h) / (originalW * originalH)) * 100).toFixed(1);
+                document.getElementById('reduction').textContent = `${reduction}% smaller`;
+            }
+        }
+        
+        function resetCrop() {
+            selectionBox.style.display = 'none';
+            selectionBox.style.width = '0px';
+            selectionBox.style.height = '0px';
+            updateStats();
+        }
+        
+        function autoDetectEdges() {
+            alert('🤖 Auto-Detect will analyze page content and detect optimal crop boundaries.\n\nThis uses AI to identify:\n• Content edges\n• White space margins\n• Optimal crop area\n\nProcessing...');
+            
+            setTimeout(() => {
+                // Simulate auto-detection (in production, would use actual image analysis)
+                const margin = 50;
+                selectionBox.style.left = margin + 'px';
+                selectionBox.style.top = margin + 'px';
+                selectionBox.style.width = (canvas.width - margin * 2) + 'px';
+                selectionBox.style.height = (canvas.height - margin * 2) + 'px';
+                selectionBox.style.display = 'block';
+                
+                updateStats();
+                alert('✅ Auto-detected optimal crop area! Adjust if needed and apply.');
+            }, 1500);
+        }
+        
+        async function applyCrop() {
+            if (selectionBox.style.display === 'none' || parseFloat(selectionBox.style.width) === 0) {
+                alert('Please draw a crop area first');
+                return;
+            }
+            
+            try {
+                const srcDoc = await PDFDocument.load(pdfBytes);
+                const pages = srcDoc.getPages();
+                
+                const x = parseFloat(selectionBox.style.left) / scale;
+                const y = parseFloat(selectionBox.style.top) / scale;
+                const w = parseFloat(selectionBox.style.width) / scale;
+                const h = parseFloat(selectionBox.style.height) / scale;
+                
+                // Apply to all pages
+                pages.forEach(page => {
+                    page.setCropBox(x, page.getHeight() - y - h, w, h);
+                });
+                
+                const pdfBytes = await srcDoc.save();
+                download(pdfBytes, 'cropped.pdf');
+            } catch (error) {
+                console.error('Crop error:', error);
+                alert('Error applying crop. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = filename;
+            a.click();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Combine multiple images into a single multi-page PDF document online. Supports JPG, PNG and more. Free and fast.">
+    <title>Multi-Page Image to PDF – Combine Images into PDF | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/multipage-image" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%238b5cf6'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #8b5cf6; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { width: 100%; max-width: 500px; background: var(--bg-card); padding: 30px; border-radius: 16px; }
+        h2 { margin-top: 0; text-align: center; }
+        
+        input, select { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; }
+        .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Long Image to PDF</h2>
+        <p style="font-size:14px; color:var(--muted)">Splits tall images across pages.</p>
+        
+        <label>Page Size</label>
+        <select id="pageSize">
+            <option value="792">US Letter (11 inch height)</option>
+            <option value="842">A4 (297mm height)</option>
+        </select>
+        
+        <button class="btn" onclick="document.getElementById('fileInput').click()">Select Image</button>
+        <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        const fileInput = document.getElementById('fileInput');
+
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            await img.decode();
+            
+            const doc = await PDFDocument.create();
+            
+            // A4 Width usually 595, Letter 612
+            const pageW = 595; 
+            const pageH = parseInt(document.getElementById('pageSize').value);
+            
+            // Scale image to fit width
+            const scale = pageW / img.width;
+            const scaledW = pageW;
+            const scaledH = img.height * scale;
+            
+            // Embed Image
+            let embeddedImg;
+            const buffer = await file.arrayBuffer();
+            if(file.type === 'image/png') embeddedImg = await doc.embedPng(buffer);
+            else embeddedImg = await doc.embedJpg(buffer);
+            
+            // How many pages needed?
+            let remainingH = scaledH;
+            let currentY = scaledH; // Start from top
+            
+            while(remainingH > 0) {
+                const page = doc.addPage([pageW, pageH]);
+                
+                // Draw the portion of the image
+                // Note: We can't draw partial images easily in pdf-lib without clipping
+                // Workaround: Draw full image but shift Y coordinate up, effectively clipping bottom
+                // And crop top via page dimensions? No.
+                
+                // Simple approach: We draw the whole image shifted.
+                // The PDF page acts as a viewport.
+                // Y on page is where the image starts drawing from bottom-left.
+                
+                // If image is 3000px tall, and page is 800px.
+                // Page 1: Y = pageH - (TotalH) ?? No.
+                // Let's draw full image. Y = pageH - scaledH.
+                // But we need to "move" the image up for subsequent pages.
+                
+                // This is complex in PDF-lib without cropping.
+                // Simpler solution: Create a tall canvas for each chunk and embed that.
+                // We will use canvas slicing.
+                
+                const chunkH = Math.min(remainingH, pageH);
+                const canvas = document.createElement('canvas');
+                canvas.width = scaledW; canvas.height = chunkH;
+                const ctx = canvas.getContext('2d');
+                
+                // Draw slice
+                const sourceY = img.height - (remainingH / scale); // Source Y from original
+                ctx.drawImage(img, 0, sourceY, img.width, chunkH / scale, 0, 0, scaledW, chunkH);
+                
+                const chunkBytes = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.9)).then(b => b.arrayBuffer());
+                const chunkImg = await doc.embedJpg(chunkBytes);
+                
+                const newPage = doc.addPage([pageW, chunkH]); // Create page exact size of chunk
+                newPage.drawImage(chunkImg, { x:0, y:0, width: scaledW, height: chunkH });
+                
+                remainingH -= pageH;
+            }
+            
+            const bytes = await doc.save();
+            download(bytes, "long_image.pdf");
+        };
+
+        function download(data, name) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = name;
+            a.click();
+        }
+    </script>
+</body>
+</html>

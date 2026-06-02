@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymize PDF – Remove Personal Data from PDF Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/anonymize" />
+    <meta name="description" content="Remove personal data, hidden metadata and identifiable information from PDF files. Free PDF anonymizer tool.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23ef4444'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --accent: #ef4444; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); text-align: center; }
+        header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .container { padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .upload-box { border: 2px dashed var(--border); padding: 60px; border-radius: 16px; cursor: pointer; width: 100%; max-width: 500px; }
+        input { display: none; }
+        .btn { margin-top: 20px; padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">Back to Home</a><div>Anonymize</div></header>
+    <div class="container">
+        <div class="upload-box" id="zone">
+            <h1>Anonymize PDF</h1>
+            <p style="color:var(--muted)">Remove all hidden data, metadata, and scripts</p>
+            <input type="file" id="input" accept=".pdf">
+        </div>
+        <button class="btn" id="proc" style="display:none" onclick="clean()">Clean File</button>
+    </div>
+    <script>
+        const { PDFDocument } = PDFLib;
+        const zone = document.getElementById('zone');
+        const input = document.getElementById('input');
+        const proc = document.getElementById('proc');
+
+        zone.onclick = () => input.click();
+        input.onchange = async (e) => {
+            if(!e.target.files[0]) return;
+            proc.style.display = 'inline-block';
+        };
+
+        async function clean() {
+            const file = document.getElementById('input').files[0];
+            const buffer = await file.arrayBuffer();
+            const srcDoc = await PDFDocument.load(buffer);
+            
+            // 1. Create a new document (this drops hidden layers, scripts, etc)
+            const newDoc = await PDFDocument.create();
+            
+            // 2. Copy only pages
+            const pages = await newDoc.copyPages(srcDoc, srcDoc.getPageIndices());
+            pages.forEach(p => newDoc.addPage(p));
+            
+            // 3. Clean Metadata
+            newDoc.setTitle('');
+            newDoc.setAuthor('');
+            newDoc.setSubject('');
+            newDoc.setKeywords([]);
+            newDoc.setProducer('PDF Suite Pro');
+            newDoc.setCreator('');
+            newDoc.setCreationDate(new Date());
+            newDoc.setModificationDate(new Date());
+
+            const bytes = await newDoc.save();
+            download(bytes, "anonymized.pdf");
+        }
+
+        function download(data, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data])); a.download = name; a.click(); }
+    </script>
+</body>
+</html>

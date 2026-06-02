@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create fillable PDF forms online with text fields, checkboxes and dropdowns. Free, browser-based form builder.">
+    <title>Create PDF Form – Build Fillable PDF Forms Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/create-form" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%233b82f6'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #3b82f6; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; overflow: hidden; }
+        header { padding: 12px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        
+        .main { display: flex; height: calc(100vh - 56px); }
+        .sidebar { width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .preview-area { flex: 1; background: #333; display: flex; align-items: center; justify-content: center; position: relative; overflow: auto; }
+        
+        canvas { box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        
+        .field-box { position: absolute; border: 2px solid var(--accent); background: rgba(59, 130, 246, 0.2); cursor: move; pointer-events: auto; }
+        .field-input { width: 100%; height: 100%; background: transparent; border: none; color: white; padding: 2px; font-size: 10px; }
+        
+        .btn { padding: 10px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">4uPDF-all</a><div>Form Creator</div></header>
+    
+    <div class="main">
+        <div class="sidebar">
+            <button class="btn" style="background:var(--border)" onclick="document.getElementById('fileInput').click()">Open PDF</button>
+            <input type="file" id="fileInput" accept=".pdf" hidden>
+            
+            <button class="btn" onclick="addField()">Add Text Field</button>
+            <button class="btn" style="background:#10b981" onclick="save()">Save Form</button>
+        </div>
+        
+        <div class="preview-area" id="previewArea">
+            <canvas id="pdfCanvas"></canvas>
+            <div class="overlay" id="overlay"></div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument, PDFTextField } = PDFLib;
+        
+        const fileInput = document.getElementById('fileInput');
+        const canvas = document.getElementById('pdfCanvas');
+        const overlay = document.getElementById('overlay');
+        
+        let pdfBytes = null;
+        let fields = [];
+
+        fileInput.onchange = async (e) => {
+            const buffer = await e.target.files[0].arrayBuffer();
+            pdfBytes = new Uint8Array(buffer);
+            const doc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+            const page = await doc.getPage(1);
+            const viewport = page.getViewport({ scale: 1.0 });
+            
+            canvas.width = viewport.width; canvas.height = viewport.height;
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        };
+
+        window.addField = () => {
+            const div = document.createElement('div');
+            div.className = 'field-box';
+            div.style.left = '50px'; div.style.top = '50px';
+            div.style.width = '150px'; div.style.height = '25px';
+            
+            // Drag logic
+            makeDraggable(div);
+            
+            overlay.appendChild(div);
+            fields.push(div);
+        };
+
+        function makeDraggable(el) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            el.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX; pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
+                pos3 = e.clientX; pos4 = e.clientY;
+                el.style.top = (el.offsetTop - pos2) + "px";
+                el.style.left = (el.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        async function save() {
+            if(!pdfBytes) return;
+            
+            const doc = await PDFDocument.load(pdfBytes);
+            const form = doc.getForm();
+            const page = doc.getPage(0);
+            
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            fields.forEach((el, idx) => {
+                const rect = el.getBoundingClientRect();
+                const scale = page.getHeight() / canvas.offsetHeight;
+                
+                const x = (rect.left - canvasRect.left) * scale;
+                const y = page.getHeight() - ((rect.top - canvasRect.top + rect.height) * scale);
+                const w = rect.width * scale;
+                const h = rect.height * scale;
+                
+                const field = form.createTextField(`field_${idx}`);
+                field.addToPage(page, { x, y, width: w, height: h });
+            });
+            
+            const bytes = await doc.save();
+            download(bytes, "fillable_form.pdf");
+        }
+
+        function download(data, name) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = name;
+            a.click();
+        }
+    </script>
+</body>
+</html>

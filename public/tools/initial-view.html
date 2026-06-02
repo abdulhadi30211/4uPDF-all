@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Set how a PDF opens in viewers. Configure zoom, page layout and initial view settings. Free and browser-based.">
+    <title>PDF Initial View Settings – Set PDF Open Options Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/initial-view" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%233b82f6'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #3b82f6; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { width: 100%; max-width: 500px; background: var(--bg-card); padding: 30px; border-radius: 16px; }
+        h2 { margin-top: 0; text-align: center; }
+        
+        .check-group { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        .check-item { display: flex; align-items: center; gap: 12px; background: var(--bg); padding: 12px; border-radius: 8px; cursor: pointer; }
+        .check-item input { width: 20px; height: 20px; }
+        .check-item label { cursor: pointer; width: 100%; }
+        
+        .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Initial View Settings</h2>
+        <p style="font-size:14px; color:var(--muted); margin-bottom:20px;">Configure how the PDF opens.</p>
+        
+        <div class="check-group">
+            <div class="check-item">
+                <input type="checkbox" id="fullscreen">
+                <label for="fullscreen">Open in Fullscreen Mode</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="hideBar">
+                <label for="hideBar">Hide Toolbars</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="hideMenu">
+                <label for="hideMenu">Hide Menu Bar</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="fitPage" checked>
+                <label for="fitPage">Fit Page on Open</label>
+            </div>
+            <div class="check-item">
+                <input type="checkbox" id="showThumbs">
+                <label for="showThumbs">Show Page Thumbnails</label>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="document.getElementById('fileInput').click()">Select PDF</button>
+        <input type="file" id="fileInput" accept=".pdf">
+    </div>
+
+    <script>
+        const { PDFDocument, PDFName, PDFDict, PDFArray, PDFNumber, PDFBool } = PDFLib;
+        const fileInput = document.getElementById('fileInput');
+
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            const buffer = await file.arrayBuffer();
+            const pdfDoc = await PDFDocument.load(buffer);
+            
+            // Get Catalog
+            const catalog = pdfDoc.catalog;
+            
+            // 1. Viewer Preferences
+            let viewerPrefs = catalog.lookup(PDFName.of('ViewerPreferences'));
+            if (!viewerPrefs) {
+                viewerPrefs = pdfDoc.context.obj({});
+                catalog.set(PDFName.of('ViewerPreferences'), viewerPrefs);
+            }
+            
+            if(document.getElementById('hideBar').checked) viewerPrefs.set(PDFName.of('HideToolbar'), PDFBool.true);
+            if(document.getElementById('hideMenu').checked) viewerPrefs.set(PDFName.of('HideMenubar'), PDFBool.true);
+            
+            // 2. Page Mode (Thumbs vs Content)
+            if(document.getElementById('showThumbs').checked) catalog.set(PDFName.of('PageMode'), PDFName.of('UseThumbs'));
+            else catalog.set(PDFName.of('PageMode'), PDFName.of('UseNone'));
+            
+            // 3. OpenAction (Fullscreen / Fit)
+            const pages = pdfDoc.getPages();
+            const firstPage = pages[0];
+            const pageRef = pdfDoc.getContext().getRedirect(pdfDoc.getPage(0).ref);
+            
+            let destArray;
+            if(document.getElementById('fitPage').checked) {
+                // Fit Destination
+                destArray = pdfDoc.context.obj([pageRef, PDFName.of('Fit')]);
+            } else {
+                // XYZ (Retain Zoom)
+                destArray = pdfDoc.context.obj([pageRef, PDFName.of('XYZ'), null, null, null]);
+            }
+            
+            if(document.getElementById('fullscreen').checked) {
+                // Fullscreen requires setting PageMode to FullScreen as well usually
+                catalog.set(PDFName.of('PageMode'), PDFName.of('FullScreen'));
+            }
+            
+            catalog.set(PDFName.of('OpenAction'), destArray);
+
+            const pdfBytes = await pdfDoc.save();
+            download(pdfBytes, "configured.pdf");
+        };
+
+        function download(data, name) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = name;
+            a.click();
+        }
+    </script>
+</body>
+</html>

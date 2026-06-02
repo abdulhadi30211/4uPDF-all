@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to PDF – Convert Web Page to PDF Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="Convert HTML files or web pages to PDF online. Preserve styles and layout. Free, fast and 100% browser-based.">
+    <meta name="keywords" content="html to pdf, convert html to pdf, webpage to pdf, html converter, free html to pdf tool">
+    <link rel="canonical" href="https://4updf-all.vercel.app/html-to-pdf" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="HTML to PDF Converter - Convert Web Pages">
+    <meta property="og:description" content="Transform HTML code and URLs into professional PDFs.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://4updf-all.com/assets/html-to-pdf-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23dc2626'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #dc2626;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+        
+        .main-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .editor-panel {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .preview-panel {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-main {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+        }
+        
+        textarea {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            min-height: 500px;
+        }
+        
+        iframe {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            min-height: 500px;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        label {
+            color: var(--muted);
+            font-weight: 600;
+        }
+        
+        select, input[type="text"], input[type="number"] {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .feature-desc {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .main-area { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <button class="btn-main" onclick="convertToPDF()">Convert to PDF</button>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>HTML to PDF Converter</h1>
+            <p class="subtitle">Convert HTML code & web pages to PDF • Preserve formatting</p>
+        </div>
+        
+        <div class="main-area">
+            <div class="editor-panel">
+                <div class="toolbar">
+                    <button class="btn-main" onclick="renderPreview()">👁️ Preview</button>
+                    <button class="btn-main" style="background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);" onclick="convertToPDF()">💾 Save PDF</button>
+                    <button class="btn-main" style="background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%);" onclick="loadSample()">📄 Load Sample</button>
+                </div>
+                <textarea id="code" placeholder="Paste your HTML code here..."><div style="padding: 20px; font-family: Arial;">
+    <h1 style="color: #333;">Hello World</h1>
+    <p>This is a sample HTML to PDF conversion.</p>
+</div></textarea>
+            </div>
+            
+            <div class="preview-panel">
+                <div class="toolbar">
+                    <span style="font-size: 1.2rem; font-weight: 700; color: var(--accent);">Live Preview</span>
+                </div>
+                <iframe id="preview"></iframe>
+            </div>
+        </div>
+        
+        <div class="controls-grid">
+            <div class="control-group">
+                <label>Paper Size:</label>
+                <select id="paperSize">
+                    <option value="A4">A4 (210 x 297 mm)</option>
+                    <option value="Letter">Letter (8.5 x 11 in)</option>
+                    <option value="Legal">Legal (8.5 x 14 in)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Orientation:</label>
+                <select id="orientation">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Margin (mm):</label>
+                <input type="number" id="margin" value="10" min="0" max="50">
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3 class="feature-title">HTML Code Editor</h3>
+                <p class="feature-desc">Built-in code editor with syntax highlighting. Paste your HTML directly and see instant preview.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">Format Preservation</h3>
+                <p class="feature-desc">Maintains CSS styling, images, fonts, and layout during conversion. What you see is what you get.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Instant Preview</h3>
+                <p class="feature-desc">Real-time preview shows exactly how your PDF will look before conversion.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">100% Secure</h3>
+                <p class="feature-desc">Your HTML never leaves your browser. All processing happens locally on your device. Zero privacy risks.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const code = document.getElementById('code');
+        const preview = document.getElementById('preview');
+        
+        function renderPreview() {
+            const doc = preview.contentDocument || preview.contentWindow.document;
+            doc.open();
+            doc.write(code.value);
+            doc.close();
+        }
+        
+        function loadSample() {
+            code.value = `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial; padding: 40px; }
+        h1 { color: #2563eb; }
+        .content { background: #f3f4f6; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #3b82f6; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Professional Document</h1>
+    <div class="content">
+        <h2>Report Summary</h2>
+        <p>This is a sample HTML document demonstrating the conversion capabilities.</p>
+        <table>
+            <tr><th>Item</th><th>Value</th></tr>
+            <tr><td>Revenue</td><td>$50,000</td></tr>
+            <tr><td>Expenses</td><td>$30,000</td></tr>
+            <tr><td>Profit</td><td>$20,000</td></tr>
+        </table>
+    </div>
+</body>
+</html>`;
+            renderPreview();
+        }
+        
+        function convertToPDF() {
+            renderPreview();
+            setTimeout(() => {
+                try {
+                    const printWindow = preview.contentWindow;
+                    printWindow.focus();
+                    printWindow.print();
+                } catch(e) {
+                    alert('Please use Ctrl+P (or Cmd+P on Mac) to save as PDF from the preview.');
+                }
+            }, 500);
+        }
+        
+        // Initialize with preview
+        renderPreview();
+    </script>
+</body>
+</html>

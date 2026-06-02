@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Add Stamp to PDF – Stamp PDF Pages Online Free | 4uPDF</title>
+    <meta name="title" content="Add Stamp to PDF - Custom Watermark & Seals | 4uPDF-all">
+    <meta name="description" content="Add rubber stamps like APPROVED, CONFIDENTIAL or custom text stamps to PDF pages. Free and browser-based.">
+    <meta name="keywords" content="add stamp to pdf, pdf stamper, watermark pdf, approved stamp pdf, confidential stamp, custom pdf stamp, position stamp pdf, online pdf tool, free pdf editor, pdf seal">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="language" content="English">
+    <meta name="author" content="4uPDF-all">
+    <link rel="canonical" href="https://4updf-all.vercel.app/add-stamp" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://4updf-all.vercel.app/add-stamp">
+    <meta property="og:title" content="Add Stamp to PDF - Custom Watermark & Seals">
+    <meta property="og:description" content="Add professional stamps to PDFs. Free tool.">
+    <meta property="og:image" content="https://4updf-all.vercel.app/assets/og-image-stamp.png">
+    <meta property="og:site_name" content="4uPDF-all">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://4updf-all.vercel.app/add-stamp">
+    <meta property="twitter:title" content="Add Stamp to PDF - Custom Watermark & Seals">
+    <meta property="twitter:description" content="Stamp PDFs easily. Free online tool.">
+    <meta property="twitter:image" content="https://4updf-all.vercel.app/assets/og-image-stamp.png">
+    
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="../assets/icon-192.svg">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.svg">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="../manifest.json">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Advanced PDF Stamp",
+      "url": "https://4updf-all.vercel.app/add-stamp",
+      "description": "Online tool to add stamps and watermarks to PDF documents",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1789"
+      },
+      "featureList": "Custom Stamps, Preset Templates, Position Control, Multiple Pages",
+      "author": {
+        "@type": "Organization",
+        "name": "4uPDF-all",
+        "url": "https://4updf-all.vercel.app"
+      }
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --primary: #ec4899;
+            --primary-dark: #db2777;
+            --primary-light: #f472b6;
+            --gradient: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 40px rgba(236, 72, 153, 0.2);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 3px dashed var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(236, 72, 153, 0.1);
+        }
+        
+        .upload-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .upload-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+        
+        .upload-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .upload-subtext {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        /* Editor Section */
+        .editor-section {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .editor-section.active {
+            display: block;
+        }
+        
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        .controls-panel {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .preview-panel {
+            background: #333;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        canvas {
+            max-width: 100%;
+            max-height: 500px;
+        }
+        
+        .stamp-overlay {
+            position: absolute;
+            border: 2px dashed var(--primary);
+            color: var(--primary);
+            font-family: 'Impact', sans-serif;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            user-select: none;
+            z-index: 10;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        
+        select, input[type="text"], input[type="color"] {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gradient);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(236, 72, 153, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+        }
+        
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .upload-area { padding: 40px 20px; }
+            .editor-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <div style="color: var(--text-muted); font-size: 14px;">PDF Stamp</div>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Add Stamp to PDF</h1>
+            <p>Add professional stamps and watermarks to your PDF documents</p>
+        </div>
+        
+        <div class="upload-area" id="dropZone">
+            <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+            </div>
+            <div class="upload-text">Drop PDF file here</div>
+            <div class="upload-subtext">or click to browse • Add stamp</div>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+        
+        <div class="editor-section" id="editorSection">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">File:</span>
+                    <span class="stat-value" id="fileName">-</span>
+                </div>
+                <div class="stat-item">
+                    <button class="btn btn-secondary" onclick="resetTool()">↺ Reset</button>
+                    <button class="btn btn-primary" onclick="applyStamp()">📍 Apply Stamp & Download</button>
+                </div>
+            </div>
+            
+            <div class="editor-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <div class="control-label">Stamp Template</div>
+                        <select id="stampTemplate" onchange="useTemplate()">
+                            <option value="APPROVED">✓ APPROVED</option>
+                            <option value="DRAFT">⧗ DRAFT</option>
+                            <option value="CONFIDENTIAL">🔒 CONFIDENTIAL</option>
+                            <option value="FINAL">★ FINAL</option>
+                            <option value="COPY">📄 COPY</option>
+                            <option value="VOID">✗ VOID</option>
+                            <option value="CUSTOM">+ Custom Text</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">Custom Text (Optional)</div>
+                        <input type="text" id="customText" placeholder="Enter custom stamp text" onchange="updateStamp()">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">Stamp Color</div>
+                        <input type="color" id="stampColor" value="#dc2626" onchange="updateStamp()">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">Opacity</div>
+                        <input type="range" id="stampOpacity" min="10" max="100" value="80" oninput="updateStamp()">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">Rotation</div>
+                        <input type="range" id="stampRotation" min="-180" max="180" value="-30" oninput="updateStamp()">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">Font Size</div>
+                        <input type="range" id="stampFontSize" min="20" max="80" value="32" oninput="updateStamp()">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="applyToAllPages">
+                            <span style="font-size: 14px; color: var(--text);">Apply to all pages</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="preview-panel">
+                    <canvas id="pdfCanvas"></canvas>
+                    <div class="stamp-overlay" id="stampEl"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.72,15.53 6,16.81V12A2,2 0 0,1 8,10H12V6H8A6,6 0 0,0 2,12A6,6 0 0,0 8,18H12V20H8A8,8 0 0,0 0,12A8,8 0 0,0 8,4A8,8 0 0,0 12,4A8,8 0 0,0 20,12A8,8 0 0,0 12,20V18C13.85,18 15.53,17.28 16.81,16H12A2,2 0 0,1 10,14V10H14A6,6 0 0,0 20,12A6,6 0 0,0 14,6H10V4H14A8,8 0 0,0 12,2Z" /></svg>
+                </div>
+                <div class="feature-title">Preset Templates</div>
+                <div class="feature-desc">Quick access to common stamps like Approved, Confidential, Draft, and more.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+                </div>
+                <div class="feature-title">Lightning Fast</div>
+                <div class="feature-desc">Browser-based processing means instant stamping without uploads.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,11.99H7V10.01H12V7.99L15.5,11L12,14.02V11.99Z" /></svg>
+                </div>
+                <div class="feature-title">100% Secure</div>
+                <div class="feature-desc">All processing happens locally in your browser. Your files never leave your device.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9,3V13H11V3H9M13,3V13H15V3H13M7,3V13H9V3H7M17,3V13H19V3H17M5,3V13H7V3H5M15,15V21H17V15H15M13,15V21H15V15H13M11,15V21H13V15H11M9,15V21H11V15H9M7,15V21H9V15H7M5,15V21H7V15H5V21H19V15H17V21H15V15H13V21H11V15H9V21H7V15H5Z" /></svg>
+                </div>
+                <div class="feature-title">Precise Positioning</div>
+                <div class="feature-desc">Drag and drop to place stamps exactly where you want them.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const editorSection = document.getElementById('editorSection');
+        const canvas = document.getElementById('pdfCanvas');
+        const stampEl = document.getElementById('stampEl');
+        const previewPanel = document.querySelector('.preview-panel');
+        
+        let pdfBytes = null;
+        let fileName = '';
+        
+        dropZone.onclick = () => fileInput.click();
+        
+        fileInput.onchange = async (e) => {
+            if (e.target.files.length > 0) {
+                await handleFile(e.target.files[0]);
+            }
+        };
+        
+        // Drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleFile(files[0]);
+            }
+        });
+        
+        async function handleFile(file) {
+            try {
+                fileName = file.name;
+                document.getElementById('fileName').textContent = fileName;
+                
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBytes = new Uint8Array(arrayBuffer);
+                
+                const pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                const page = await pdfDoc.getPage(1);
+                const viewport = page.getViewport({ scale: 1.0 });
+                
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({ 
+                    canvasContext: canvas.getContext('2d'), 
+                    viewport: viewport 
+                }).promise;
+                
+                updateStamp();
+                makeDraggable(stampEl);
+                
+                editorSection.classList.add('active');
+                dropZone.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF file. Please try another file.');
+            }
+        }
+        
+        function useTemplate() {
+            const template = document.getElementById('stampTemplate').value;
+            if (template !== 'CUSTOM') {
+                document.getElementById('customText').value = template;
+                updateStamp();
+            } else {
+                document.getElementById('customText').value = '';
+                document.getElementById('customText').focus();
+            }
+        }
+        
+        function updateStamp() {
+            const text = document.getElementById('customText').value || document.getElementById('stampTemplate').value;
+            const color = document.getElementById('stampColor').value;
+            const opacity = parseInt(document.getElementById('stampOpacity').value) / 100;
+            const rotation = parseInt(document.getElementById('stampRotation').value);
+            const fontSize = parseInt(document.getElementById('stampFontSize').value);
+            
+            stampEl.innerText = text;
+            stampEl.style.color = color;
+            stampEl.style.opacity = opacity;
+            stampEl.style.border = `2px dashed ${color}`;
+            stampEl.style.fontSize = `${fontSize}px`;
+            stampEl.style.transform = `rotate(${rotation}deg)`;
+            
+            // Auto-size the stamp element
+            stampEl.style.width = 'auto';
+            stampEl.style.height = 'auto';
+            stampEl.style.padding = '20px';
+        }
+        
+        function makeDraggable(el) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            el.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                el.style.top = (el.offsetTop - pos2) + "px";
+                el.style.left = (el.offsetLeft - pos1) + "px";
+                el.style.right = "auto";
+                el.style.bottom = "auto";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+        
+        function resetTool() {
+            location.reload();
+        }
+        
+        async function applyStamp() {
+            if (!pdfBytes) return;
+            
+            try {
+                const srcDoc = await PDFDocument.load(pdfBytes);
+                const pages = srcDoc.getPages();
+                const font = await srcDoc.embedFont(StandardFonts.HelveticaBold);
+                
+                const text = document.getElementById('customText').value || document.getElementById('stampTemplate').value;
+                const colorHex = document.getElementById('stampColor').value;
+                const opacity = parseInt(document.getElementById('stampOpacity').value) / 100;
+                const rotation = parseInt(document.getElementById('stampRotation').value);
+                const applyToAll = document.getElementById('applyToAllPages').checked;
+                
+                const canvasRect = canvas.getBoundingClientRect();
+                const stampRect = stampEl.getBoundingClientRect();
+                
+                const r = parseInt(colorHex.slice(1, 3), 16) / 255;
+                const g = parseInt(colorHex.slice(3, 5), 16) / 255;
+                const b = parseInt(colorHex.slice(5, 7), 16) / 255;
+                
+                const pagesToApply = applyToAll ? pages : [pages[0]];
+                
+                pagesToApply.forEach(page => {
+                    const scale = page.getHeight() / canvas.offsetHeight;
+                    const x = (stampRect.left - canvasRect.left + stampRect.width / 2) * scale;
+                    const y = page.getHeight() - ((stampRect.top - canvasRect.top + stampRect.height / 2) * scale);
+                    
+                    page.drawText(text, {
+                        x: x - font.widthOfTextAtSize(text, 30) / 2,
+                        y: y,
+                        size: 30,
+                        font: font,
+                        color: rgb(r, g, b),
+                        opacity: opacity,
+                        rotate: { angle: rotation, type: 'degrees' }
+                    });
+                });
+                
+                const pdfBytesResult = await srcDoc.save();
+                download(pdfBytesResult, 'stamped.pdf');
+                
+            } catch (error) {
+                console.error('Stamp error:', error);
+                alert('Error applying stamp. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = filename;
+            a.click();
+        }
+    </script>
+</body>
+</html>

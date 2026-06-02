@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to PNG – Convert PDF to PNG Images Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/pdf-to-png" />
+    <meta name="description" content="Convert PDF pages to transparent PNG images online. High resolution output, batch convert all pages. Free and browser-based.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23ec4899'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --accent: #ec4899; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); text-align: center; padding: 0; margin: 0; }
+        header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .container { padding: 40px; }
+        .upload-box { border: 2px dashed var(--border); padding: 60px; border-radius: 16px; max-width: 600px; margin: 0 auto; cursor: pointer; }
+        input { display: none; }
+        .btn { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 20px; }
+        .grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 40px; }
+        img { width: 120px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">Back to Home</a>
+        <div>PDF to PNG</div>
+    </header>
+
+    <div class="container">
+        <div class="upload-box" id="zone">
+            <h1>Convert PDF to PNG</h1>
+            <p style="color: var(--muted);">High quality with transparency support</p>
+            <input type="file" id="input" accept=".pdf">
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        const zone = document.getElementById('zone');
+        const input = document.getElementById('input');
+        const results = document.getElementById('results');
+
+        zone.onclick = () => input.click();
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            const zip = new JSZip();
+            const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+            
+            results.innerHTML = '<p>Processing...</p>';
+            
+            for(let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 2 });
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                
+                // Transparent background
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                await page.render({ canvasContext: ctx, viewport }).promise;
+                
+                const imgData = canvas.toDataURL('image/png');
+                zip.file(`page-${i}.png`, imgData.split(',')[1], {base64: true});
+                
+                const img = document.createElement('img');
+                img.src = imgData;
+                results.appendChild(img);
+            }
+
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.textContent = 'Download All as ZIP';
+            btn.onclick = async () => {
+                const content = await zip.generateAsync({type: 'blob'});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(content);
+                a.download = 'png_images.zip';
+                a.click();
+            };
+            results.appendChild(btn);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert PDF text to audio MP3 files online. Text-to-speech conversion for accessibility and listening on the go. Free.">
+    <title>PDF to Audio – Convert PDF to MP3 Speech Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/pdf-to-audio" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%2310b981'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #10b981; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { width: 100%; max-width: 500px; background: var(--bg-card); padding: 30px; border-radius: 16px; }
+        h2 { margin-top: 0; text-align: center; }
+        select { width: 100%; padding: 10px; margin: 10px 0; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; }
+        .btn { width: 100%; padding: 12px; background: var(--accent); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 10px; }
+        input { display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>PDF to Audio</h2>
+        <p style="font-size:14px; color:var(--muted)">Reads PDF text aloud (Live).</p>
+        
+        <label>Voice</label>
+        <select id="voiceSelect"></select>
+        
+        <button class="btn" style="background:var(--border); color:white" onclick="document.getElementById('fileInput').click()">Select PDF</button>
+        <input type="file" id="fileInput" accept=".pdf">
+        <button class="btn" id="speakBtn" style="display:none" onclick="speak()">Read Aloud</button>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        const fileInput = document.getElementById('fileInput');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const speakBtn = document.getElementById('speakBtn');
+        
+        // Load voices
+        let voices = [];
+        function populateVoices() {
+            voices = speechSynthesis.getVoices();
+            voiceSelect.innerHTML = voices.map((v, i) => `<option value="${i}">${v.name} (${v.lang})</option>`).join('');
+        }
+        populateVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = populateVoices;
+
+        fileInput.onchange = async (e) => {
+            const buffer = await e.target.files[0].arrayBuffer();
+            const doc = await pdfjsLib.getDocument({ data: buffer }).promise;
+            let text = "";
+            for(let i=1; i<=doc.numPages; i++) {
+                const page = await doc.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(s => s.str).join(' ') + " ";
+            }
+            window.pdfText = text;
+            speakBtn.style.display = 'block';
+        };
+
+        function speak() {
+            if(!window.pdfText) return;
+            const utterance = new SpeechSynthesisUtterance(window.pdfText);
+            utterance.voice = voices[voiceSelect.value];
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>

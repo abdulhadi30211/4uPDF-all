@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to EPUB – Convert PDF to eBook Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/pdf-to-epub" />
+    <meta name="description" content="Convert PDF files to EPUB ebook format online. Readable on Kindle, iPad, and all ebook readers. Free and browser-based.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23a855f7'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --accent: #a855f7; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        header { padding: 20px 40px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+        .box { background: var(--bg-card); padding: 50px; border-radius: 24px; max-width: 550px; width: 100%; border: 1px solid var(--border); text-align: center; }
+        .icon { width: 60px; height: 60px; margin: 0 auto 20px; background: rgba(168, 85, 247, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--accent); }
+        h1 { font-size: 26px; margin-bottom: 10px; }
+        p { color: var(--muted); margin-bottom: 30px; }
+        .upload-zone { border: 2px dashed var(--border); padding: 30px; border-radius: 12px; cursor: pointer; margin-bottom: 20px; }
+        input { display: none; }
+        .btn { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">PDF Suite Pro</a><div>PDF to EPUB</div></header>
+    <div class="container">
+        <div class="box">
+            <div class="icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
+            <h1>PDF to EPUB</h1>
+            <p>Convert PDF documents to reflowable EPUB ebooks optimized for e-readers.</p>
+            
+            <div class="upload-zone" onclick="document.getElementById('file').click()">
+                <input type="file" id="file" accept=".pdf">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:10px; opacity:0.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                <p style="font-size:14px; margin:0;">Select PDF file</p>
+            </div>
+            <button class="btn" onclick="alert('Creating reflowable EPUBs requires complex layout analysis. UI Demo.')">Convert to EPUB</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse PDF Pages – Flip Page Order Online Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="Reverse the page order of any PDF document online. Flip from last to first page instantly. Free and browser-based.">
+    <meta name="keywords" content="reverse pdf pages, flip pdf order, reverse page sequence, pdf page sorter, booklet preparation, free pdf reverser">
+    <link rel="canonical" href="https://4updf-all.vercel.app/reverse-order" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Reverse PDF Page Order">
+    <meta property="og:description" content="Flip PDF pages from back to front instantly. Perfect for scanned docs.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://4updf-all.com/assets/reverse-order-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%2310b981'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #10b981;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+        
+        .upload-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .upload-box.dragover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn-main {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+        }
+        
+        .preview-area {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .pages-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .page-thumb {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .page-thumb img {
+            width: 100%;
+            height: 160px;
+            object-fit: contain;
+            background: white;
+        }
+        
+        .page-num {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        
+        .arrow-indicator {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--accent);
+            margin: 20px 0;
+        }
+        
+        .stats-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .feature-desc {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .pages-preview { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <button class="btn-main" onclick="reversePages()">Reverse & Download</button>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Reverse PDF Order</h1>
+            <p class="subtitle">Flip pages back-to-front • Perfect for scans & booklets</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-box" id="dropZone">
+                <div class="upload-icon">📄</div>
+                <h2>Upload PDF to Reverse</h2>
+                <p style="color: var(--muted); margin: 15px 0;">Drag & drop or click to browse</p>
+                <button class="btn-main">Select PDF File</button>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading PDF...</p>
+        </div>
+        
+        <div class="preview-area" id="previewArea">
+            <h3 style="margin-bottom: 15px;">Original Order</h3>
+            <div class="pages-preview" id="originalPreview"></div>
+            
+            <div class="arrow-indicator">⬇️⬇️⬇️</div>
+            
+            <h3 style="margin-bottom: 15px;">Reversed Order</h3>
+            <div class="pages-preview" id="reversedPreview"></div>
+        </div>
+        
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalPages">0</div>
+                <div class="stat-label">Total Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="firstPage">-</div>
+                <div class="stat-label">First Page →</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="lastPage">-</div>
+                <div class="stat-label">Last Page →</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h3 class="feature-title">Booklet Preparation</h3>
+                <p class="feature-desc">Perfect for preparing documents for booklet printing. Reverse order ensures correct page sequence when folded.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📠</div>
+                <h3 class="feature-title">Scan Correction</h3>
+                <p class="feature-desc">Scanned documents often come out reversed. Fix the order instantly with one click.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Instant Processing</h3>
+                <p class="feature-desc">Reverse pages in seconds. Preview before and after to verify the result.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">100% Secure</h3>
+                <p class="feature-desc">Your PDFs never leave your browser. All processing happens locally on your device. Zero privacy risks.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewArea = document.getElementById('previewArea');
+        const statsBar = document.getElementById('statsBar');
+        const loading = document.getElementById('loading');
+        
+        let pdfBytes = null;
+        let pdfDoc = null;
+        
+        setupDropZone();
+        
+        function setupDropZone() {
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            dropZone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'application/pdf') {
+                    handleFile(files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+        }
+        
+        async function handleFile(file) {
+            try {
+                loading.style.display = 'block';
+                dropZone.style.display = 'none';
+                
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBytes = new Uint8Array(arrayBuffer);
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                
+                await renderPreviews();
+                updateStats();
+                
+                previewArea.style.display = 'block';
+                statsBar.style.display = 'grid';
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF. Please try again.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function renderPreviews() {
+            const originalGrid = document.getElementById('originalPreview');
+            const reversedGrid = document.getElementById('reversedPreview');
+            originalGrid.innerHTML = '';
+            reversedGrid.innerHTML = '';
+            
+            const pageCount = pdfDoc.numPages;
+            
+            for (let i = 1; i <= pageCount; i++) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 0.2 });
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({
+                    canvasContext: canvas.getContext('2d'),
+                    viewport
+                }).promise;
+                
+                const thumb = document.createElement('div');
+                thumb.className = 'page-thumb';
+                thumb.innerHTML = `
+                    <img src="${canvas.toDataURL()}" alt="Page ${i}">
+                    <div class="page-num">Page ${i}</div>
+                `;
+                originalGrid.appendChild(thumb);
+            }
+            
+            for (let i = pageCount; i >= 1; i--) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 0.2 });
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({
+                    canvasContext: canvas.getContext('2d'),
+                    viewport
+                }).promise;
+                
+                const thumb = document.createElement('div');
+                thumb.className = 'page-thumb';
+                thumb.innerHTML = `
+                    <img src="${canvas.toDataURL()}" alt="Page ${i}">
+                    <div class="page-num">Page ${pageCount - i + 1}</div>
+                `;
+                reversedGrid.appendChild(thumb);
+            }
+        }
+        
+        function updateStats() {
+            const total = pdfDoc.numPages;
+            const first = total;
+            const last = 1;
+            
+            document.getElementById('totalPages').textContent = total;
+            document.getElementById('firstPage').textContent = `Page ${first}`;
+            document.getElementById('lastPage').textContent = `Page ${last}`;
+        }
+        
+        async function reversePages() {
+            if (!pdfBytes) {
+                alert('Please load a PDF first');
+                return;
+            }
+            
+            try {
+                const srcDoc = await PDFDocument.load(pdfBytes);
+                const newDoc = await PDFDocument.create();
+                
+                const pageCount = srcDoc.numPages;
+                const indices = [];
+                for (let i = pageCount - 1; i >= 0; i--) {
+                    indices.push(i);
+                }
+                
+                const copiedPages = await newDoc.copyPages(srcDoc, indices);
+                copiedPages.forEach(page => newDoc.addPage(page));
+                
+                const pdfBytesResult = await newDoc.save();
+                download(pdfBytesResult, 'reversed_order.pdf');
+                
+            } catch (error) {
+                console.error('Error reversing pages:', error);
+                alert('Error reversing pages. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Poster – Print Large PDF Across Multiple Pages | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="Split a PDF page into a large poster printable across multiple sheets. Free online poster printing tool.">
+    <meta name="keywords" content="poster pdf, split pdf tiles, large format printing, pdf tiling, banner creator, pdf poster, multi-page poster, free pdf splitter">
+    <link rel="canonical" href="https://4updf-all.vercel.app/poster" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Poster PDF Creator - Split into Tiles">
+    <meta property="og:description" content="Split PDF pages into tiles for poster printing. Create large format prints easily.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://4updf-all.com/assets/poster-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%2364748b'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #64748b;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #64748b 0%, #94a3b8 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+        
+        .upload-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: rgba(100, 116, 139, 0.05);
+        }
+        
+        .upload-box.dragover {
+            border-color: var(--accent);
+            background: rgba(100, 116, 139, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn-main {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+        }
+        
+        .controls-panel {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        label {
+            color: var(--muted);
+            font-weight: 600;
+        }
+        
+        select, input[type="number"] {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .preview-container {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        #previewCanvas {
+            max-width: 100%;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+        }
+        
+        .stats-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .feature-desc {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .control-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <button class="btn-main" onclick="createTiles()">Create Poster Tiles</button>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Poster PDF Creator</h1>
+            <p class="subtitle">Split PDF pages into tiles • Print large posters at home</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-box" id="dropZone">
+                <div class="upload-icon">📄</div>
+                <h2>Upload PDF for Poster</h2>
+                <p style="color: var(--muted); margin: 15px 0;">Drag & drop or click to browse</p>
+                <button class="btn-main">Select PDF File</button>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading PDF...</p>
+        </div>
+        
+        <div class="controls-panel" id="controlsPanel">
+            <div class="control-grid">
+                <div class="control-group">
+                    <label>Select Page:</label>
+                    <input type="number" id="pageNum" value="1" min="1">
+                </div>
+                
+                <div class="control-group">
+                    <label>Grid Size:</label>
+                    <select id="gridSize">
+                        <option value="2">2 x 2 (4 tiles)</option>
+                        <option value="3">3 x 3 (9 tiles)</option>
+                        <option value="4">4 x 4 (16 tiles)</option>
+                        <option value="5">5 x 5 (25 tiles)</option>
+                        <option value="6">6 x 6 (36 tiles)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Overlap (mm):</label>
+                    <input type="number" id="overlap" value="10" min="0" max="50">
+                </div>
+                
+                <div class="control-group">
+                    <label>Scale Output:</label>
+                    <select id="scale">
+                        <option value="1">100% (Original Size)</option>
+                        <option value="1.5">150%</option>
+                        <option value="2">200%</option>
+                        <option value="3">300%</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-container" id="previewContainer" style="display:none;">
+            <canvas id="previewCanvas"></canvas>
+        </div>
+        
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="tileCount">0</div>
+                <div class="stat-label">Total Tiles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="posterSize">-</div>
+                <div class="stat-label">Poster Size</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="printSheets">0</div>
+                <div class="stat-label">Print Sheets</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📐</div>
+                <h3 class="feature-title">Large Format Printing</h3>
+                <p class="feature-desc">Create poster-sized prints from any PDF. Split into manageable tiles that fit your home printer.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">✂️</div>
+                <h3 class="feature-title">Easy Assembly</h3>
+                <p class="feature-desc">Add overlap margins for easy trimming and assembly. Perfect alignment every time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Flexible Scaling</h3>
+                <p class="feature-desc">Scale output from 100% to 300%. Choose grid size from 2x2 to 6x6 for custom poster sizes.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">100% Secure</h3>
+                <p class="feature-desc">Your PDFs never leave your browser. All processing happens locally on your device. Zero privacy risks.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const controlsPanel = document.getElementById('controlsPanel');
+        const previewContainer = document.getElementById('previewContainer');
+        const statsBar = document.getElementById('statsBar');
+        const loading = document.getElementById('loading');
+        
+        let pdfBytes = null;
+        let pdfDoc = null;
+        
+        setupDropZone();
+        
+        function setupDropZone() {
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            dropZone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'application/pdf') {
+                    handleFile(files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+        }
+        
+        async function handleFile(file) {
+            try {
+                loading.style.display = 'block';
+                dropZone.style.display = 'none';
+                
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBytes = new Uint8Array(arrayBuffer);
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                
+                document.getElementById('pageNum').max = pdfDoc.numPages;
+                
+                controlsPanel.style.display = 'grid';
+                await renderPreview();
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF. Please try again.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function renderPreview() {
+            const pageNum = parseInt(document.getElementById('pageNum').value) - 1;
+            const page = await pdfDoc.getPage(pageNum + 1);
+            const viewport = page.getViewport({ scale: 0.5 });
+            
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            await page.render({
+                canvasContext: ctx,
+                viewport: viewport
+            }).promise;
+            
+            previewContainer.style.display = 'block';
+            updateStats();
+        }
+        
+        document.getElementById('pageNum').addEventListener('change', renderPreview);
+        document.getElementById('gridSize').addEventListener('change', updateStats);
+        document.getElementById('scale').addEventListener('change', updateStats);
+        
+        function updateStats() {
+            const gridSize = parseInt(document.getElementById('gridSize').value);
+            const scale = parseFloat(document.getElementById('scale').value);
+            const tileCount = gridSize * gridSize;
+            
+            let posterSize = '';
+            if (pdfDoc) {
+                const page = pdfDoc.getPage(1).then(p => {
+                    const { width, height } = p.getWidth();
+                    const finalW = width * gridSize * scale / 72; // Convert to inches
+                    const finalH = height * gridSize * scale / 72;
+                    posterSize = `${finalW.toFixed(1)}" x ${finalH.toFixed(1)}"`;
+                    document.getElementById('posterSize').textContent = posterSize;
+                });
+            }
+            
+            document.getElementById('tileCount').textContent = tileCount;
+            document.getElementById('printSheets').textContent = tileCount;
+        }
+        
+        async function createTiles() {
+            if (!pdfBytes) {
+                alert('Please load a PDF first');
+                return;
+            }
+            
+            try {
+                const gridSize = parseInt(document.getElementById('gridSize').value);
+                const targetPage = parseInt(document.getElementById('pageNum').value) - 1;
+                const overlapMm = parseInt(document.getElementById('overlap').value);
+                const scaleFactor = parseFloat(document.getElementById('scale').value);
+                
+                const srcDoc = await PDFDocument.load(pdfBytes);
+                const newDoc = await PDFDocument.create();
+                
+                const [page] = await newDoc.copyPages(srcDoc, [targetPage]);
+                let { width, height } = page.getSize();
+                
+                width *= scaleFactor;
+                height *= scaleFactor;
+                
+                const overlapPoints = (overlapMm * 2.83); // Convert mm to points
+                
+                const tileW = width / gridSize;
+                const tileH = height / gridSize;
+                
+                for (let r = 0; r < gridSize; r++) {
+                    for (let c = 0; c < gridSize; c++) {
+                        const newPage = newDoc.addPage([tileW + overlapMm * 2.83, tileH + overlapMm * 2.83]);
+                        
+                        const x = -c * tileW + overlapMm * 2.83;
+                        const y = -r * tileH + overlapMm * 2.83;
+                        
+                        newPage.drawPage(page, { 
+                            x: x, 
+                            y: y, 
+                            width: width, 
+                            height: height 
+                        });
+                    }
+                }
+                
+                const pdfBytesResult = await newDoc.save();
+                download(pdfBytesResult, 'poster_tiles.pdf');
+                
+            } catch (error) {
+                console.error('Tile creation error:', error);
+                alert('Error creating tiles. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

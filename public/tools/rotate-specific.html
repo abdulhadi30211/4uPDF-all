@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rotate selected pages in a PDF without affecting others. Choose rotation angle per page. Free, fast and browser-based.">
+    <title>Rotate Specific PDF Pages – Free Online Tool | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/rotate-specific" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%2314b8a6'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #14b8a6; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        header { padding: 12px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        
+        .container { padding: 20px; }
+        .upload-box { border: 2px dashed var(--border); padding: 40px; border-radius: 16px; cursor: pointer; width: 100%; max-width: 600px; margin: 0 auto; text-align: center; }
+        input { display: none; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; margin-top: 20px; max-width: 1200px; margin: 20px auto; }
+        .page-card { background: var(--bg-card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        .page-card img { width: 100%; height: 200px; object-fit: contain; background: white; }
+        .controls { display: flex; justify-content: center; gap: 5px; padding: 10px; background: rgba(0,0,0,0.2); }
+        .btn-icon { background: transparent; border: 1px solid var(--border); color: white; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-icon:hover { background: var(--accent); color: black; border-color: var(--accent); }
+        
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 15px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 15px; }
+        .btn { padding: 10px 24px; background: var(--accent); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">4uPDF-all</a><div>Rotate Specific Pages</div></header>
+    
+    <div class="container">
+        <div class="upload-box" id="dropZone"><h2>Select PDF</h2><input type="file" id="fileInput" accept=".pdf"></div>
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <div class="bottom-bar" id="bottomBar" style="display:none">
+        <button class="btn" onclick="save()">Save Changes</button>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument, degrees } = PDFLib;
+        
+        const fileInput = document.getElementById('fileInput');
+        const grid = document.getElementById('grid');
+        const bottomBar = document.getElementById('bottomBar');
+        
+        let pdfBytes = null;
+        let rotations = {}; // index: degrees
+
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+        async function handleFile(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            pdfBytes = new Uint8Array(arrayBuffer);
+            const doc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+            
+            rotations = {};
+            for(let i=0; i<doc.numPages; i++) rotations[i] = 0;
+            
+            renderGrid();
+            dropZone.style.display = 'none';
+            bottomBar.style.display = 'flex';
+        }
+
+        async function renderGrid() {
+            grid.innerHTML = '';
+            const doc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+            
+            for(let i=1; i<=doc.numPages; i++) {
+                const page = await doc.getPage(i);
+                const viewport = page.getViewport({ scale: 0.4, rotation: rotations[i-1] });
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width; canvas.height = viewport.height;
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                
+                const card = document.createElement('div');
+                card.className = 'page-card';
+                card.innerHTML = `
+                    <img src="${canvas.toDataURL()}">
+                    <div class="controls">
+                        <button class="btn-icon" onclick="rotate(${i-1}, -90)">Left</button>
+                        <button class="btn-icon" onclick="rotate(${i-1}, 180)">180</button>
+                        <button class="btn-icon" onclick="rotate(${i-1}, 90)">Right</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        window.rotate = (idx, deg) => {
+            rotations[idx] = (rotations[idx] + deg) % 360;
+            if(rotations[idx] < 0) rotations[idx] = 270;
+            renderGrid();
+        };
+
+        async function save() {
+            const srcDoc = await PDFDocument.load(pdfBytes);
+            const pages = srcDoc.getPages();
+            
+            Object.keys(rotations).forEach(idx => {
+                if(rotations[idx] !== 0) {
+                    pages[idx].setRotation(degrees(rotations[idx]));
+                }
+            });
+
+            const bytes = await srcDoc.save();
+            download(bytes, "rotated.pdf");
+        }
+
+        function download(data, name) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = name;
+            a.click();
+        }
+    </script>
+</body>
+</html>

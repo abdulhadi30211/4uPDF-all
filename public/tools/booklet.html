@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Booklet – Create Booklet Layout from PDF Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="Rearrange PDF pages into a printable booklet layout. Fold and print to create pamphlets or booklets. Free tool.">
+    <meta name="keywords" content="pdf booklet creator, saddle stitch imposition, printable booklet, brochure maker, pdf booklet printer, free booklet tool">
+    <link rel="canonical" href="https://4updf-all.vercel.app/booklet" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="PDF Booklet Creator - Saddle Stitch Imposition">
+    <meta property="og:description" content="Create printable booklets with automatic page reordering. Professional saddle-stitch format.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://4updf-all.com/assets/booklet-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23ec4899'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #ec4899;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+        
+        .upload-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: rgba(236, 72, 153, 0.05);
+        }
+        
+        .upload-box.dragover {
+            border-color: var(--accent);
+            background: rgba(236, 72, 153, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn-main {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+        }
+        
+        .controls-panel {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        label {
+            color: var(--muted);
+            font-weight: 600;
+        }
+        
+        select {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .preview-area {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .sheets-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .sheet-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .sheet-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .sheet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .page-slot {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .page-slot img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .slot-label {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+        
+        .stats-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .feature-desc {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .control-grid { grid-template-columns: 1fr; }
+            .sheets-preview { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <button class="btn-main" onclick="createBooklet()">Download Booklet</button>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>PDF Booklet Creator</h1>
+            <p class="subtitle">Saddle-stitch imposition • Double-sided printing • Professional results</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-box" id="dropZone">
+                <div class="upload-icon">📄</div>
+                <h2>Upload PDF for Booklet</h2>
+                <p style="color: var(--muted); margin: 15px 0;">Drag & drop or click to browse</p>
+                <button class="btn-main">Select PDF File</button>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Creating booklet...</p>
+        </div>
+        
+        <div class="controls-panel" id="controlsPanel">
+            <div class="control-grid">
+                <div class="control-group">
+                    <label>Paper Size:</label>
+                    <select id="paperSize">
+                        <option value="letter">Letter (8.5" x 11")</option>
+                        <option value="legal">Legal (8.5" x 14")</option>
+                        <option value="a4">A4 (210mm x 297mm)</option>
+                        <option value="a3">A3 (297mm x 420mm)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Orientation:</label>
+                    <select id="orientation">
+                        <option value="portrait">Portrait</option>
+                        <option value="landscape">Landscape</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Binding Margin:</label>
+                    <select id="bindingMargin">
+                        <option value="0">No Extra Margin</option>
+                        <option value="10">10 points</option>
+                        <option value="20">20 points</option>
+                        <option value="30">30 points</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-area" id="previewArea">
+            <h3 style="margin-bottom: 15px;">Booklet Preview</h3>
+            <div class="sheets-preview" id="sheetsPreview"></div>
+        </div>
+        
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalPages">0</div>
+                <div class="stat-label">Original Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="bookletPages">0</div>
+                <div class="stat-label">Booklet Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="sheets">0</div>
+                <div class="stat-label">Print Sheets</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="blankAdded">0</div>
+                <div class="stat-label">Blanks Added</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📖</div>
+                <h3 class="feature-title">Saddle-Stitch Format</h3>
+                <p class="feature-desc">Professional booklet layout with automatic page reordering. Perfect for stapled booklets and brochures.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🖨️</div>
+                <h3 class="feature-title">Double-Sided Ready</h3>
+                <p class="feature-desc">Optimized for duplex printing. Each sheet contains 4 pages (2 on front, 2 on back).</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Auto-Fill Blanks</h3>
+                <p class="feature-desc">Automatically adds blank pages to complete the booklet format. Ensures perfect binding every time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">100% Secure</h3>
+                <p class="feature-desc">Your PDFs never leave your browser. All processing happens locally on your device. Zero privacy risks.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const controlsPanel = document.getElementById('controlsPanel');
+        const previewArea = document.getElementById('previewArea');
+        const statsBar = document.getElementById('statsBar');
+        const loading = document.getElementById('loading');
+        
+        let pdfBytes = null;
+        let bookletBytes = null;
+        let originalPages = 0;
+        
+        setupDropZone();
+        
+        function setupDropZone() {
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            dropZone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'application/pdf') {
+                    handleFile(files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+        }
+        
+        async function handleFile(file) {
+            try {
+                loading.style.display = 'block';
+                dropZone.style.display = 'none';
+                
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBytes = new Uint8Array(arrayBuffer);
+                const pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                
+                originalPages = pdfDoc.numPages;
+                controlsPanel.style.display = 'grid';
+                
+                await generateBooklet(pdfDoc);
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF. Please try again.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function generateBooklet(pdfDoc) {
+            const totalPages = pdfDoc.numPages;
+            const neededBlanks = (4 - (totalPages % 4)) % 4;
+            const finalPages = totalPages + neededBlanks;
+            const sheets = finalPages / 4;
+            
+            const srcDoc = await PDFDocument.load(pdfBytes);
+            const newDoc = await PDFDocument.create();
+            
+            const pageWidth = srcDoc.getPage(0).getWidth();
+            const pageHeight = srcDoc.getPage(0).getHeight();
+            
+            for (let i = 0; i < finalPages / 2; i += 2) {
+                const p1 = finalPages - i;
+                const p2 = i + 1;
+                const p3 = i + 2;
+                const p4 = finalPages - i - 1;
+                
+                const indices = [p1 - 1, p2 - 1, p3 - 1, p4 - 1].filter(idx => idx >= 0 && idx < srcDoc.numPages);
+                
+                const embeddedPages = [];
+                for (const idx of indices) {
+                    if (idx < srcDoc.numPages) {
+                        const [emb] = await newDoc.embedPdf(srcDoc, [idx]);
+                        embeddedPages.push(emb);
+                    } else {
+                        const blankPage = newDoc.addPage([pageWidth, pageHeight]);
+                        embeddedPages.push(blankPage);
+                    }
+                }
+                
+                const frontPage = newDoc.addPage([pageWidth * 2, pageHeight]);
+                if (embeddedPages[0]) {
+                    frontPage.drawPage(embeddedPages[0], { 
+                        x: 0, 
+                        y: 0, 
+                        width: pageWidth, 
+                        height: pageHeight 
+                    });
+                }
+                if (embeddedPages[1]) {
+                    frontPage.drawPage(embeddedPages[1], { 
+                        x: pageWidth, 
+                        y: 0, 
+                        width: pageWidth, 
+                        height: pageHeight 
+                    });
+                }
+                
+                const backPage = newDoc.addPage([pageWidth * 2, pageHeight]);
+                if (embeddedPages[2]) {
+                    backPage.drawPage(embeddedPages[2], { 
+                        x: 0, 
+                        y: 0, 
+                        width: pageWidth, 
+                        height: pageHeight 
+                    });
+                }
+                if (embeddedPages[3]) {
+                    backPage.drawPage(embeddedPages[3], { 
+                        x: pageWidth, 
+                        y: 0, 
+                        width: pageWidth, 
+                        height: pageHeight 
+                    });
+                }
+            }
+            
+            bookletBytes = await newDoc.save();
+            updateStats(finalPages, sheets, neededBlanks);
+            renderPreview(sheets);
+            
+            previewArea.style.display = 'block';
+            statsBar.style.display = 'grid';
+        }
+        
+        function updateStats(finalPages, sheets, blanks) {
+            document.getElementById('totalPages').textContent = originalPages;
+            document.getElementById('bookletPages').textContent = finalPages;
+            document.getElementById('sheets').textContent = sheets;
+            document.getElementById('blankAdded').textContent = blanks;
+        }
+        
+        function renderPreview(sheets) {
+            const container = document.getElementById('sheetsPreview');
+            container.innerHTML = '';
+            
+            for (let s = 0; s < Math.min(sheets, 4); s++) {
+                const sheetCard = document.createElement('div');
+                sheetCard.className = 'sheet-card';
+                sheetCard.innerHTML = `
+                    <div class="sheet-title">Sheet ${s + 1}</div>
+                    <div class="sheet-grid">
+                        <div class="page-slot">
+                            <div class="slot-label">Front Left (P${((sheets - s) * 4)})</div>
+                        </div>
+                        <div class="page-slot">
+                            <div class="slot-label">Front Right (P${(s * 4) + 1})</div>
+                        </div>
+                        <div class="page-slot">
+                            <div class="slot-label">Back Left (P${(s * 4) + 2})</div>
+                        </div>
+                        <div class="page-slot">
+                            <div class="slot-label">Back Right (P${((sheets - s) * 4) - 1})</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(sheetCard);
+            }
+        }
+        
+        async function createBooklet() {
+            if (!bookletBytes) {
+                alert('Please load a PDF first');
+                return;
+            }
+            
+            download(bookletBytes, 'booklet.pdf');
+        }
+        
+        function download(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

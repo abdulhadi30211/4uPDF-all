@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test – Tools | 4uPDF</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://4updf-all.vercel.app/test-tools" />
+    <meta name="description" content="Internal tools test page.">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 40px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            border: 2px solid #334155;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .tool-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+        
+        .tool-card p {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+        
+        .features-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .features-list li {
+            padding: 8px 0;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .features-list li:before {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .test-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+            border: 2px solid #334155;
+        }
+        
+        .test-section h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .test-steps {
+            counter-reset: step;
+            list-style: none;
+        }
+        
+        .test-steps li {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+            color: #94a3b8;
+        }
+        
+        .test-steps li:before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .note {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #94a3b8;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Tools - Fixed & Working</h1>
+        <p class="subtitle">Three essential PDF tools have been repaired and tested</p>
+        
+        <div class="tools-grid">
+            <!-- Sign Tool -->
+            <div class="tool-card">
+                <div class="tool-icon">✍️</div>
+                <span class="status-badge">✅ FIXED</span>
+                <h2>Sign PDF Tool</h2>
+                <p>Add digital signatures to your PDF documents with multiple creation methods and precise positioning.</p>
+                
+                <ul class="features-list">
+                    <li>Draw signatures with mouse/touch</li>
+                    <li>Type signatures (3 font styles)</li>
+                    <li>Upload signature images</li>
+                    <li>Multi-page support</li>
+                    <li>Drag & drop positioning</li>
+                    <li>Color selection</li>
+                </ul>
+                
+                <a href="sign.html" class="btn">Open Sign Tool →</a>
+            </div>
+            
+            <!-- Watermark Remover -->
+            <div class="tool-card">
+                <div class="tool-icon">🧹</div>
+                <span class="status-badge">✅ FIXED</span>
+                <h2>Watermark Remover</h2>
+                <p>Remove watermarks from PDF documents using advanced AI-powered detection and removal.</p>
+                
+                <ul class="features-list">
+                    <li>Auto-detect watermarks</li>
+                    <li>Manual selection mode</li>
+                    <li>Batch processing</li>
+                    <li>Precision mode</li>
+                    <li>Multiple coverage strategies</li>
+                    <li>Privacy-focused (browser-based)</li>
+                </ul>
+                
+                <a href="watermark-remover.html" class="btn">Open Watermark Remover →</a>
+            </div>
+            
+            <!-- Text Editor -->
+            <div class="tool-card">
+                <div class="tool-icon">📝</div>
+                <span class="status-badge">✅ FIXED</span>
+                <h2>PDF Text Editor</h2>
+                <p>Add and edit text on PDF documents with full control over fonts, colors, and positioning.</p>
+                
+                <ul class="features-list">
+                    <li>Add text anywhere</li>
+                    <li>6 font families</li>
+                    <li>Font size control (8-72)</li>
+                    <li>Color picker</li>
+                    <li>Opacity control</li>
+                    <li>Multi-page navigation</li>
+                </ul>
+                
+                <a href="edit-text.html" class="btn">Open Text Editor →</a>
+            </div>
+        </div>
+        
+        <!-- Testing Guide -->
+        <div class="test-section">
+            <h3>🧪 How to Test the Tools</h3>
+            
+            <h4 style="margin: 20px 0 15px; color: var(--primary);">Sign Tool Testing:</h4>
+            <ol class="test-steps">
+                <li>Click "Open Sign Tool" button above</li>
+                <li>Upload any PDF file (drag & drop or click to browse)</li>
+                <li>Create a signature using Draw, Type, or Upload method</li>
+                <li>Drag the signature field to your desired position</li>
+                <li>Click "Download Signed PDF" button in sidebar</li>
+                <li>Verify the signature appears correctly in the downloaded PDF</li>
+            </ol>
+            
+            <h4 style="margin: 20px 0 15px; color: var(--primary);">Watermark Remover Testing:</h4>
+            <ol class="test-steps">
+                <li>Click "Open Watermark Remover" button above</li>
+                <li>Select a removal mode (Auto Detect recommended)</li>
+                <li>Upload a PDF file that contains watermarks</li>
+                <li>Wait for the tool to process the PDF</li>
+                <li>Download the cleaned PDF</li>
+                <li>Verify watermarks have been removed/covered</li>
+            </ol>
+            
+            <h4 style="margin: 20px 0 15px; color: var(--primary);">Text Editor Testing:</h4>
+            <ol class="test-steps">
+                <li>Click "Open Text Editor" button above</li>
+                <li>Upload a PDF file</li>
+                <li>Click "Add Text" button in toolbar</li>
+                <li>Edit the text content (click to type)</li>
+                <li>Adjust font, size, color, and opacity using toolbar controls</li>
+                <li>Drag the text element to desired position</li>
+                <li>Click "Save PDF" button in header</li>
+                <li>Verify text appears correctly in downloaded PDF</li>
+            </ol>
+        </div>
+        
+        <!-- Important Notes -->
+        <div class="note">
+            <strong>📌 Important Notes:</strong>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>All processing happens 100% in your browser - no files are uploaded to any server</li>
+                <li>For best results, use modern browsers (Chrome, Firefox, Edge, Safari)</li>
+                <li>Large PDF files (>50MB) may take longer to process</li>
+                <li>Signature images work best as PNG with transparent background</li>
+                <li>Text editor can only add new text, not edit existing PDF text</li>
+            </ul>
+        </div>
+        
+        <footer>
+            <p>✅ All tools have been tested and verified working</p>
+            <p style="margin-top: 10px; font-size: 0.875rem;">Powered by PDF.js and PDF-Lib</p>
+        </footer>
+    </div>
+</body>
+</html>

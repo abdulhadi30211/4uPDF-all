@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to HTML – Convert PDF to HTML Online Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/pdf-to-html" />
+    <meta name="description" content="Convert PDF documents to HTML web pages online. Preserve formatting, extract content for the web. Free and fast.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23dc2626'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --accent: #dc2626; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .container { padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .upload-box { border: 2px dashed var(--border); padding: 60px; border-radius: 16px; cursor: pointer; width: 100%; max-width: 500px; text-align: center; }
+        input { display: none; }
+        .btn { margin-top: 20px; padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">Back to Home</a><div>PDF to HTML</div></header>
+    <div class="container">
+        <div class="upload-box" id="zone"><h1>Convert PDF to HTML</h1><input type="file" id="input" accept=".pdf"></div>
+        <button class="btn" id="dl" style="display:none" onclick="save()">Download HTML</button>
+    </div>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const zone = document.getElementById('zone');
+        const input = document.getElementById('input');
+        const dl = document.getElementById('dl');
+        let htmlContent = "";
+
+        zone.onclick = () => input.click();
+        input.onchange = async (e) => {
+            const file = e.target.files[0]; if(!file) return;
+            const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+            
+            htmlContent = `<!DOCTYPE html><html><head><title>PDF to HTML – Convert PDF to HTML Online Free | 4uPDF</title><style>body{font-family:Arial,sans-serif;padding:20px;background:#f0f0f0;} .page{background:white;margin:20px auto;padding:40px;max-width:800px;box-shadow:0 0 10px rgba(0,0,0,0.1);}</style></head><body>`;
+            
+            for(let i=1; i<=pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const text = await page.getTextContent();
+                htmlContent += `<div class="page"><h3>Page ${i}</h3>`;
+                text.items.forEach(item => {
+                    // Basic block grouping by Y position could be done here
+                    htmlContent += `<div style="margin-bottom:4px;">${item.str}</div>`;
+                });
+                htmlContent += `</div>`;
+            }
+            htmlContent += `</body></html>`;
+            
+            dl.style.display = 'inline-block';
+        };
+
+        function save() {
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'converted.html';
+            a.click();
+        }
+    </script>
+</body>
+</html>

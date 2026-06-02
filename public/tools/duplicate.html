@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicate PDF Pages – Copy Pages in PDF Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/duplicate" />
+    <meta name="description" content="Duplicate selected pages within a PDF document online. Copy any page multiple times. Free, fast and browser-based.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23f59e0b'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --accent: #f59e0b; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .container { padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .upload-box { border: 2px dashed var(--border); padding: 60px; border-radius: 16px; cursor: pointer; width: 100%; max-width: 500px; text-align: center; }
+        input { display: none; }
+        .options { margin-top: 20px; background: var(--bg-card); padding: 24px; border-radius: 12px; width: 100%; max-width: 400px; display: none; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; }
+        .btn { width: 100%; padding: 12px; background: var(--accent); color: #0f172a; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">Back to Home</a><div>Duplicate Pages</div></header>
+    <div class="container">
+        <div class="upload-box" id="zone"><h1>Select PDF</h1><input type="file" id="input" accept=".pdf"></div>
+        <div class="options" id="opts">
+            <h3 style="margin-bottom:12px;">Duplicate Settings</h3>
+            <label style="font-size:13px;color:var(--muted)">Page Number to Duplicate</label>
+            <input type="number" id="page" value="1" min="1">
+            
+            <label style="font-size:13px;color:var(--muted)">Number of Copies</label>
+            <input type="number" id="count" value="1" min="1">
+            
+            <button class="btn" onclick="duplicate()">Duplicate</button>
+        </div>
+    </div>
+    <script>
+        const { PDFDocument } = PDFLib;
+        const zone = document.getElementById('zone');
+        const input = document.getElementById('input');
+        const opts = document.getElementById('opts');
+        let pdfDoc = null;
+
+        zone.onclick = () => input.click();
+        input.onchange = async (e) => {
+            if(!e.target.files[0]) return;
+            const buffer = await e.target.files[0].arrayBuffer();
+            pdfDoc = await PDFDocument.load(buffer);
+            opts.style.display = 'block';
+            document.getElementById('page').max = pdfDoc.getPageCount();
+        };
+
+        async function duplicate() {
+            const pageIndex = parseInt(document.getElementById('page').value) - 1;
+            const count = parseInt(document.getElementById('count').value);
+
+            // We can't easily insert pages at specific spots without creating a new doc
+            const newDoc = await PDFDocument.create();
+            const pages = pdfDoc.getPages();
+
+            for(let i=0; i<pages.length; i++) {
+                // Copy existing page
+                const [copiedPage] = await newDoc.copyPages(pdfDoc, [i]);
+                newDoc.addPage(copiedPage);
+
+                // If this is the target page, insert duplicates
+                if(i === pageIndex) {
+                    for(let j=0; j<count; j++) {
+                        const [dupPage] = await newDoc.copyPages(pdfDoc, [i]);
+                        newDoc.addPage(dupPage);
+                    }
+                }
+            }
+
+            const bytes = await newDoc.save();
+            download(bytes, "duplicated.pdf");
+        }
+
+        function download(data, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data])); a.download = name; a.click(); }
+    </script>
+</body>
+</html>

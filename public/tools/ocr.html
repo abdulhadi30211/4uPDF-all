@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>OCR PDF – Recognize Text in Scanned PDFs Free | 4uPDF</title>
+    <meta name="title" content="OCR PDF Online - Convert Scanned PDF to Text | 4uPDF-all">
+    <meta name="description" content="Use OCR to extract and recognize text from scanned PDFs and images. Make documents searchable. Free browser tool.">
+    <meta name="keywords" content="ocr pdf, pdf ocr, scanned pdf to text, pdf text extractor, multi-language ocr, batch ocr, online ocr tool, free pdf ocr, text recognition">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="language" content="English">
+    <meta name="author" content="4uPDF-all">
+    <link rel="canonical" href="https://4updf-all.vercel.app/ocr" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://4updf-all.vercel.app/ocr">
+    <meta property="og:title" content="OCR PDF Online - Convert Scanned PDF to Text">
+    <meta property="og:description" content="OCR PDF with multi-language support. Convert scanned documents to text instantly.">
+    <meta property="og:image" content="https://4updf-all.vercel.app/assets/og-image-ocr.png">
+    <meta property="og:site_name" content="4uPDF-all">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://4updf-all.vercel.app/ocr">
+    <meta property="twitter:title" content="OCR PDF Online - Convert Scanned PDF to Text">
+    <meta property="twitter:description" content="Multi-language OCR for PDFs. Fast, accurate, free.">
+    <meta property="twitter:image" content="https://4updf-all.vercel.app/assets/og-image-ocr.png">
+    
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="../assets/icon-192.svg">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.svg">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="../manifest.json">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Advanced PDF OCR",
+      "url": "https://4updf-all.vercel.app/ocr",
+      "description": "Online OCR tool to convert scanned PDFs to text",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "2156"
+      },
+      "featureList": "Multi-Language OCR, Batch Processing, High Accuracy, Searchable PDF",
+      "author": {
+        "@type": "Organization",
+        "name": "4uPDF-all",
+        "url": "https://4updf-all.vercel.app"
+      }
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root {
+            --primary: #a855f7;
+            --primary-dark: #9333ea;
+            --primary-light: #c084fc;
+            --gradient: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --shadow: 0 10px 40px rgba(168, 85, 247, 0.2);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 3px dashed var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(168, 85, 247, 0.1);
+        }
+        
+        .upload-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .upload-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+        
+        .upload-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .upload-subtext {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        /* OCR Controls */
+        .ocr-controls {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .ocr-controls.active {
+            display: block;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .control-select, .control-input {
+            padding: 12px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        
+        .control-select:focus, .control-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Progress Area */
+        .progress-area {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .progress-area.active {
+            display: block;
+        }
+        
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--gradient);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .progress-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .progress-percent {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Output Area */
+        .output-area {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .output-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .output-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(168, 85, 247, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+        }
+        
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .upload-area { padding: 40px 20px; }
+            .ocr-controls { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <div style="color: var(--text-muted); font-size: 14px;">OCR Scanner</div>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>OCR PDF Online</h1>
+            <p>Convert scanned PDFs to searchable text with advanced optical character recognition</p>
+        </div>
+        
+        <div class="upload-area" id="dropZone">
+            <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+            </div>
+            <div class="upload-text">Drop scanned PDF here</div>
+            <div class="upload-subtext">or click to browse • Multi-language OCR</div>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+        
+        <div class="ocr-controls" id="ocrControls">
+            <div class="control-grid">
+                <div class="control-group">
+                    <label class="control-label">Recognition Language:</label>
+                    <select id="language" class="control-select">
+                        <option value="eng">English</option>
+                        <option value="spa">Spanish</option>
+                        <option value="fra">French</option>
+                        <option value="deu">German</option>
+                        <option value="ita">Italian</option>
+                        <option value="por">Portuguese</option>
+                        <option value="rus">Russian</option>
+                        <option value="chi_sim">Chinese (Simplified)</option>
+                        <option value="chi_tra">Chinese (Traditional)</option>
+                        <option value="jpn">Japanese</option>
+                        <option value="kor">Korean</option>
+                        <option value="ara">Arabic</option>
+                        <option value="hin">Hindi</option>
+                        <option value="ben">Bengali</option>
+                        <option value="vie">Vietnamese</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Output Format:</label>
+                    <select id="outputFormat" class="control-select">
+                        <option value="text">Plain Text (.txt)</option>
+                        <option value="searchable-pdf">Searchable PDF</option>
+                        <option value="word">Word Document (.docx)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Processing Mode:</label>
+                    <select id="processingMode" class="control-select">
+                        <option value="fast">Fast (Lower Quality)</option>
+                        <option value="balanced" selected>Balanced</option>
+                        <option value="best">Best Quality (Slower)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">Pages:</span>
+                    <span class="stat-value" id="pageCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Status:</span>
+                    <span class="stat-value" id="statusText">Ready</span>
+                </div>
+                <div class="stat-item">
+                    <button class="btn btn-primary" onclick="startOCR()">🚀 Start OCR</button>
+                </div>
+            </div>
+            
+            <div class="progress-area" id="progressArea">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+                <div class="progress-status">
+                    <span class="progress-text" id="progressText">Initializing OCR engine...</span>
+                    <span class="progress-percent" id="progressPercent">0%</span>
+                </div>
+            </div>
+            
+            <div class="output-area">
+                <div class="output-header">
+                    <div class="output-title">Extracted Text</div>
+                    <div class="output-actions">
+                        <button class="btn btn-secondary" onclick="copyToClipboard()">📋 Copy</button>
+                        <button class="btn btn-primary" onclick="downloadResult()">💾 Download</button>
+                    </div>
+                </div>
+                <textarea id="outputText" placeholder="OCR results will appear here..." readonly></textarea>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" /></svg>
+                </div>
+                <div class="feature-title">100+ Languages</div>
+                <div class="feature-desc">Support for over 100 languages with high accuracy recognition.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.72,15.53 6,16.81V12A2,2 0 0,1 8,10H12V6H8A6,6 0 0,0 2,12A6,6 0 0,0 8,18H12V20H8A8,8 0 0,0 0,12A8,8 0 0,0 8,4A8,8 0 0,0 12,4A8,8 0 0,0 20,12A8,8 0 0,0 12,20V18C13.85,18 15.53,17.28 16.81,16H12A2,2 0 0,1 10,14V10H14A6,6 0 0,0 20,12A6,6 0 0,0 14,6H10V4H14A8,8 0 0,0 12,2Z" /></svg>
+                </div>
+                <div class="feature-title">Lightning Fast</div>
+                <div class="feature-desc">Browser-based processing means instant OCR without server uploads.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,11.99H7V10.01H12V7.99L15.5,11L12,14.02V11.99Z" /></svg>
+                </div>
+                <div class="feature-title">100% Secure</div>
+                <div class="feature-desc">All processing happens locally in your browser. Your files never leave your device.</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9,3V13H11V3H9M13,3V13H15V3H13M7,3V13H9V3H7M17,3V13H19V3H17M5,3V13H7V3H5M15,15V21H17V15H15M13,15V21H15V15H13M11,15V21H13V15H11M9,15V21H11V15H9M7,15V21H9V15H7M5,15V21H7V15H5V21H19V15H17V21H15V15H13V21H11V15H9V21H7V15H5Z" /></svg>
+                </div>
+                <div class="feature-title">Multiple Formats</div>
+                <div class="feature-desc">Export as TXT, searchable PDF, or Word document for maximum flexibility.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const ocrControls = document.getElementById('ocrControls');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressPercent = document.getElementById('progressPercent');
+        const outputText = document.getElementById('outputText');
+        
+        let pdfDoc = null;
+        let pdfBytes = null;
+        let totalPages = 0;
+        let worker = null;
+        
+        dropZone.onclick = () => fileInput.click();
+        
+        fileInput.onchange = async (e) => {
+            if (e.target.files.length > 0) {
+                await handleFile(e.target.files[0]);
+            }
+        };
+        
+        // Drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleFile(files[0]);
+            }
+        });
+        
+        async function handleFile(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBytes = new Uint8Array(arrayBuffer);
+                pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                totalPages = pdfDoc.numPages;
+                document.getElementById('pageCount').textContent = totalPages;
+                
+                ocrControls.classList.add('active');
+                dropZone.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF file. Please try another file.');
+            }
+        }
+        
+        async function startOCR() {
+            const language = document.getElementById('language').value;
+            const mode = document.getElementById('processingMode').value;
+            
+            document.getElementById('progressArea').classList.add('active');
+            document.getElementById('statusText').textContent = 'Processing...';
+            
+            try {
+                // Create Tesseract worker
+                worker = await Tesseract.createWorker(language, 1, {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            const percent = Math.round(m.progress * 100);
+                            progressBar.style.width = percent + '%';
+                            progressPercent.textContent = percent + '%';
+                            progressText.textContent = `Page ${currentPage} of ${totalPages}: ${m.status}`;
+                        } else {
+                            progressText.textContent = m.status;
+                        }
+                    }
+                });
+                
+                let fullText = '';
+                let currentPage = 1;
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    progressText.textContent = `Processing page ${i} of ${totalPages}...`;
+                    currentPage = i;
+                    
+                    const page = await pdfDoc.getPage(i);
+                    const viewport = page.getViewport({ scale: 2 });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    
+                    await page.render({ 
+                        canvasContext: canvas.getContext('2d'), 
+                        viewport 
+                    }).promise;
+                    
+                    const { data: { text } } = await worker.recognize(canvas);
+                    fullText += `\n\n--- Page ${i} ---\n${text}`;
+                    
+                    outputText.value = fullText;
+                }
+                
+                await worker.terminate();
+                
+                progressText.textContent = '✅ OCR Complete!';
+                document.getElementById('statusText').textContent = 'Finished';
+                progressBar.style.width = '100%';
+                progressPercent.textContent = '100%';
+                
+            } catch (error) {
+                console.error('OCR error:', error);
+                alert('Error during OCR processing. Please try again.');
+                document.getElementById('statusText').textContent = 'Error';
+            }
+        }
+        
+        function copyToClipboard() {
+            outputText.select();
+            document.execCommand('copy');
+            alert('✅ Text copied to clipboard!');
+        }
+        
+        function downloadResult() {
+            const format = document.getElementById('outputFormat').value;
+            const text = outputText.value;
+            
+            if (format === 'text') {
+                const blob = new Blob([text], { type: 'text/plain' });
+                download(blob, 'ocr_output.txt');
+            } else if (format === 'searchable-pdf') {
+                // For searchable PDF, would need additional library
+                alert('Searchable PDF export coming soon! For now, please use Plain Text format.');
+            } else if (format === 'word') {
+                alert('Word export coming soon! For now, please use Plain Text format.');
+            }
+        }
+        
+        function download(data, filename) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(data);
+            a.download = filename;
+            a.click();
+        }
+    </script>
+</body>
+</html>

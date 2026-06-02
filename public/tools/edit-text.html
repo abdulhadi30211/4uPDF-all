@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit PDF Text – Modify Text in PDF Online Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="Edit text directly in PDF documents online. Fix typos, update content and change fonts. Free browser-based PDF editor.">
+    <meta name="keywords" content="edit pdf text, add text to pdf, pdf text editor, insert text pdf, modify pdf text, free pdf editor">
+    <link rel="canonical" href="https://4updf-all.vercel.app/edit-text" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Edit PDF Text - Add & Modify Text">
+    <meta property="og:description" content="Advanced PDF text editor with full formatting control.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://4updf-all.com/assets/edit-text-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%233b82f6'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #3b82f6;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .toolbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .btn-main {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        label {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        input[type="number"], select {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        input[type="color"] {
+            width: 40px;
+            height: 30px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .workspace {
+            flex: 1;
+            background: #525659;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: auto;
+            padding: 40px;
+        }
+        
+        .canvas-container {
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        #pdfCanvas {
+            display: block;
+        }
+        
+        .text-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .text-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px dashed var(--accent);
+            padding: 5px 10px;
+            cursor: move;
+            pointer-events: auto;
+            min-width: 50px;
+            min-height: 20px;
+            font-family: Arial, sans-serif;
+            outline: none;
+            user-select: all;
+            transition: border-color 0.2s;
+        }
+        
+        .text-element:hover, .text-element:focus {
+            border-color: #ef4444;
+        }
+        
+        .text-element.editing {
+            border-style: solid;
+            border-width: 2px;
+        }
+        
+        .page-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--bg);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .page-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .page-btn:disabled {
+            background: var(--muted);
+            cursor: not-allowed;
+        }
+        
+        .stats {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .control-group { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <button class="btn-main" onclick="savePDF()">💾 Save PDF</button>
+    </header>
+    
+    <div class="container">
+        <div class="toolbar">
+            <input type="file" id="fileInput" accept=".pdf" hidden>
+            <button class="btn-main" onclick="document.getElementById('fileInput').click()">📂 Open PDF</button>
+            
+            <button class="btn-main" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="addTextElement()">➕ Add Text</button>
+            
+            <div class="control-group">
+                <label>Font:</label>
+                <select id="fontFamily">
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Size:</label>
+                <input type="number" id="fontSize" value="14" min="8" max="72" style="width: 70px;">
+            </div>
+            
+            <div class="control-group">
+                <label>Color:</label>
+                <input type="color" id="fontColor" value="#000000">
+            </div>
+            
+            <div class="control-group">
+                <label>Opacity:</label>
+                <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="1" style="width: 100px;">
+            </div>
+            
+            <div class="page-controls">
+                <button class="page-btn" onclick="previousPage()" id="prevBtn">◀</button>
+                <span class="stats" id="pageStats">Page 1 of 1</span>
+                <button class="page-btn" onclick="nextPage()" id="nextBtn">▶</button>
+            </div>
+            
+            <button class="btn-main" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);" onclick="deleteSelected()">🗑️ Delete Selected</button>
+        </div>
+        
+        <div class="workspace">
+            <div class="canvas-container">
+                <canvas id="pdfCanvas"></canvas>
+                <div class="text-layer" id="textLayer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        
+        let pdfDoc = null;
+        let pdfBytes = null;
+        let currentPageNum = 1;
+        let textElements = [];
+        let selectedElement = null;
+        let scale = 1.5;
+        
+        // File upload
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || file.type !== 'application/pdf') {
+                alert('Please select a valid PDF file');
+                return;
+            }
+            
+            try {
+                pdfBytes = await file.arrayBuffer();
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                
+                currentPageNum = 1;
+                textElements = [];
+                await renderPage(currentPageNum);
+                
+                document.getElementById('pageStats').textContent = `Page 1 of ${pdfDoc.numPages}`;
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF. Please try again.');
+            }
+        });
+        
+        async function renderPage(pageNum) {
+            if (!pdfDoc) return;
+            
+            const page = await pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale });
+            
+            const canvas = document.getElementById('pdfCanvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            const context = canvas.getContext('2d');
+            await page.render({
+                canvasContext: context,
+                viewport: viewport
+            }).promise;
+            
+            // Update text elements visibility
+            updateTextElementsVisibility(pageNum);
+            
+            // Update page controls
+            document.getElementById('pageStats').textContent = `Page ${pageNum} of ${pdfDoc.numPages}`;
+            document.getElementById('prevBtn').disabled = pageNum === 1;
+            document.getElementById('nextBtn').disabled = pageNum === pdfDoc.numPages;
+        }
+        
+        function addTextElement() {
+            if (!pdfDoc) {
+                alert('Please open a PDF first');
+                return;
+            }
+            
+            const textEl = document.createElement('div');
+            textEl.className = 'text-element';
+            textEl.contentEditable = true;
+            textEl.innerText = 'Click to edit';
+            textEl.style.left = '50%';
+            textEl.style.top = '50%';
+            textEl.style.fontFamily = document.getElementById('fontFamily').value;
+            textEl.style.fontSize = document.getElementById('fontSize').value + 'px';
+            textEl.style.color = document.getElementById('fontColor').value;
+            textEl.style.opacity = document.getElementById('opacity').value;
+            
+            makeDraggable(textEl);
+            setupSelection(textEl);
+            
+            document.getElementById('textLayer').appendChild(textEl);
+            textElements.push({
+                element: textEl,
+                page: currentPageNum,
+                x: 50,
+                y: 50
+            });
+            
+            textEl.focus();
+        }
+        
+        function makeDraggable(el) {
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            
+            el.addEventListener('mousedown', (e) => {
+                if (e.target !== el) return;
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = el.offsetLeft;
+                initialTop = el.offsetTop;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                el.style.left = `${initialLeft + dx}px`;
+                el.style.top = `${initialTop + dy}px`;
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        }
+        
+        function setupSelection(el) {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectElement(el);
+            });
+            
+            el.addEventListener('blur', () => {
+                el.classList.remove('editing');
+            });
+            
+            el.addEventListener('focus', () => {
+                el.classList.add('editing');
+            });
+        }
+        
+        function selectElement(el) {
+            if (selectedElement) {
+                selectedElement.style.border = '2px dashed var(--accent)';
+            }
+            selectedElement = el;
+            el.style.border = '2px dashed #ef4444';
+            
+            // Update toolbar to match element properties
+            const computedStyle = window.getComputedStyle(el);
+            document.getElementById('fontFamily').value = computedStyle.fontFamily.split(',')[0].replace(/['"]/g, '');
+            document.getElementById('fontSize').value = parseInt(computedStyle.fontSize);
+            document.getElementById('fontColor').value = rgbToHex(computedStyle.color);
+        }
+        
+        function deleteSelected() {
+            if (!selectedElement) {
+                alert('No text element selected');
+                return;
+            }
+            
+            selectedElement.remove();
+            textElements = textElements.filter(te => te.element !== selectedElement);
+            selectedElement = null;
+        }
+        
+        function updateTextElementsVisibility(pageNum) {
+            textElements.forEach(te => {
+                if (te.page === pageNum) {
+                    te.element.style.display = 'block';
+                } else {
+                    te.element.style.display = 'none';
+                }
+            });
+        }
+        
+        function previousPage() {
+            if (currentPageNum > 1) {
+                currentPageNum--;
+                renderPage(currentPageNum);
+            }
+        }
+        
+        function nextPage() {
+            if (currentPageNum < pdfDoc.numPages) {
+                currentPageNum++;
+                renderPage(currentPageNum);
+            }
+        }
+        
+        async function savePDF() {
+            if (!pdfBytes) {
+                alert('Please open a PDF first');
+                return;
+            }
+            
+            if (textElements.length === 0) {
+                alert('No text elements added');
+                return;
+            }
+            
+            try {
+                const pdfLibDoc = await PDFDocument.load(pdfBytes);
+                const pages = pdfLibDoc.getPages();
+                
+                // Embed fonts based on what's used
+                const fontPromises = {};
+                const neededFonts = [...new Set(textElements.map(te => {
+                    const family = te.element.style.fontFamily.split(',')[0].replace(/['"]/g, '');
+                    if (family.includes('Arial') || family.includes('Helvetica')) return 'Helvetica';
+                    if (family.includes('Times')) return 'TimesRoman';
+                    if (family.includes('Courier')) return 'Courier';
+                    return 'Helvetica';
+                }))];
+                
+                for (const fontName of neededFonts) {
+                    switch(fontName) {
+                        case 'TimesRoman':
+                            fontPromises[fontName] = pdfLibDoc.embedFont(StandardFonts.TimesRoman);
+                            break;
+                        case 'Courier':
+                            fontPromises[fontName] = pdfLibDoc.embedFont(StandardFonts.Courier);
+                            break;
+                        default:
+                            fontPromises[fontName] = pdfLibDoc.embedFont(StandardFonts.Helvetica);
+                    }
+                }
+                
+                const fonts = {};
+                for (const [name, promise] of Object.entries(fontPromises)) {
+                    fonts[name] = await promise;
+                }
+                
+                for (const te of textElements) {
+                    if (te.page > pages.length) continue;
+                    
+                    const page = pages[te.page - 1];
+                    const { width, height } = page.getSize();
+                    
+                    const canvas = document.getElementById('pdfCanvas');
+                    const canvasRect = canvas.getBoundingClientRect();
+                    const elRect = te.element.getBoundingClientRect();
+                    
+                    // Calculate position relative to canvas
+                    const xPercent = (elRect.left - canvasRect.left) / canvasRect.width;
+                    const yPercent = (elRect.top - canvasRect.top) / canvasRect.height;
+                    const wPercent = elRect.width / canvasRect.width;
+                    const hPercent = elRect.height / canvasRect.height;
+                    
+                    // Convert to PDF coordinates (origin is bottom-left)
+                    const x = xPercent * width;
+                    const y = height - (yPercent * height) - (hPercent * height);
+                    
+                    const fontSize = parseFloat(te.element.style.fontSize) * (width / canvasRect.width);
+                    const color = hexToRgb(te.element.style.color);
+                    
+                    // Get appropriate font
+                    const fontFamily = te.element.style.fontFamily.split(',')[0].replace(/['"]/g, '');
+                    let font;
+                    if (fontFamily.includes('Arial') || fontFamily.includes('Helvetica')) {
+                        font = fonts['Helvetica'];
+                    } else if (fontFamily.includes('Times')) {
+                        font = fonts['TimesRoman'];
+                    } else if (fontFamily.includes('Courier')) {
+                        font = fonts['Courier'];
+                    } else {
+                        font = fonts['Helvetica'];
+                    }
+                    
+                    page.drawText(te.element.innerText, {
+                        x: x,
+                        y: y,
+                        size: fontSize,
+                        font: font,
+                        color: rgb(color.r / 255, color.g / 255, color.b / 255),
+                        opacity: parseFloat(te.element.style.opacity)
+                    });
+                }
+                
+                const modifiedPdfBytes = await pdfLibDoc.save();
+                download(modifiedPdfBytes, 'edited_text.pdf');
+                
+            } catch (error) {
+                console.error('Error saving PDF:', error);
+                alert('Error saving PDF. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Show success message with stats
+            alert(`✅ PDF saved successfully!\n\n📊 Statistics:\n- Pages: ${pdfDoc.numPages}\n- Text elements added: ${textElements.length}\n\nYour edited PDF has been downloaded.`);
+        }
+        
+        // Helper functions
+        function rgbToHex(rgb) {
+            if (rgb.startsWith('#')) return rgb;
+            const rgbValues = rgb.match(/\d+/g);
+            if (!rgbValues) return '#000000';
+            return '#' + rgbValues.map(x => {
+                const hex = parseInt(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+        
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 0, b: 0 };
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete' && selectedElement) {
+                deleteSelected();
+            }
+        });
+        
+        // Prevent default drag behavior
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('text-element')) {
+                e.preventDefault();
+            }
+        });
+        
+        // Click outside to deselect
+        document.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('text-element') && selectedElement) {
+                selectedElement.style.border = '2px dashed var(--accent)';
+                selectedElement = null;
+            }
+        });
+    </script>
+</body>
+</html>

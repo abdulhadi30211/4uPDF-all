@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alternate Merge PDF – Interleave PDF Pages Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="Interleave pages from two PDF files alternately. Perfect for double-sided scans. Free online alternate merge tool.">
+    <meta name="keywords" content="alternate merge pdf, interleave pages, merge pdfs alternating, duplex scan fix, combine pdf pages, pdf page interleaver, free pdf merger">
+    <link rel="canonical" href="https://4updf-all.vercel.app/alternate-merge" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Alternate Merge PDF - Interleave Pages">
+    <meta property="og:description" content="Combine two PDFs by alternating pages. Perfect for duplex scans.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://4updf-all.com/assets/alternate-merge-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%2310b981'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #10b981;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+        
+        .upload-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .upload-box.dragover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn-main {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+        }
+        
+        .preview-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .column {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .column-header {
+            background: var(--bg);
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .column-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .page-thumb {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .page-thumb:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .page-thumb img {
+            width: 100%;
+            height: 160px;
+            object-fit: contain;
+            background: white;
+        }
+        
+        .page-num {
+            padding: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        
+        .controls-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        label {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        
+        select {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .stats-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .feature-desc {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .preview-section { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <button class="btn-main" onclick="merge()">Merge PDFs</button>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Alternate Merge PDF</h1>
+            <p class="subtitle">Interleave pages from two PDFs • Perfect for duplex scans</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-box" id="dropZone1">
+                <div class="upload-icon">📄</div>
+                <h3>Odd Pages (Front)</h3>
+                <p style="color: var(--muted); margin: 15px 0;">Drop first PDF or click to browse</p>
+                <button class="btn-main">Select PDF</button>
+                <input type="file" id="file1" accept=".pdf">
+            </div>
+            
+            <div class="upload-box" id="dropZone2">
+                <div class="upload-icon">📄</div>
+                <h3>Even Pages (Back)</h3>
+                <p style="color: var(--muted); margin: 15px 0;">Drop second PDF or click to browse</p>
+                <button class="btn-main">Select PDF</button>
+                <input type="file" id="file2" accept=".pdf">
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading PDFs...</p>
+        </div>
+        
+        <div class="controls-bar" id="controlsBar" style="display:none;">
+            <div class="control-group">
+                <label>Merge Order:</label>
+                <select id="mergeOrder">
+                    <option value="1-2-1-2">Start with PDF 1 (1-2-1-2...)</option>
+                    <option value="2-1-2-1">Start with PDF 2 (2-1-2-1...)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Pages at a time:</label>
+                <select id="batchSize">
+                    <option value="1">1 page each</option>
+                    <option value="2">2 pages each</option>
+                    <option value="3">3 pages each</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <button class="btn-main" onclick="clearAll()">Clear All</button>
+            </div>
+        </div>
+        
+        <div class="preview-section" id="previewSection" style="display:none;">
+            <div class="column">
+                <div class="column-header">
+                    <div class="column-title">PDF 1 - Odd Pages (Front)</div>
+                </div>
+                <div class="pages-grid" id="grid1"></div>
+            </div>
+            
+            <div class="column">
+                <div class="column-header">
+                    <div class="column-title">PDF 2 - Even Pages (Back)</div>
+                </div>
+                <div class="pages-grid" id="grid2"></div>
+            </div>
+        </div>
+        
+        <div class="stats-bar" id="statsBar" style="display:none;">
+            <div class="stat-item">
+                <div class="stat-value" id="pdf1Pages">0</div>
+                <div class="stat-label">PDF 1 Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="pdf2Pages">0</div>
+                <div class="stat-label">PDF 2 Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalPages">0</div>
+                <div class="stat-label">Total Merged Pages</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Duplex Scan Fix</h3>
+                <p class="feature-desc">Perfect for combining front and back scans from single-sided scanners. Automatically interleaves pages in correct order.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Flexible Merging</h3>
+                <p class="feature-desc">Choose merge order and batch size. Start with either PDF and merge 1, 2, or 3 pages at a time for custom patterns.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">100% Secure</h3>
+                <p class="feature-desc">Your PDFs never leave your browser. All processing happens locally on your device. Zero privacy risks.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3 class="feature-title">Lossless Quality</h3>
+                <p class="feature-desc">Maintain original PDF quality throughout the merge process. No compression or quality loss.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone1 = document.getElementById('dropZone1');
+        const file1 = document.getElementById('file1');
+        const dropZone2 = document.getElementById('dropZone2');
+        const file2 = document.getElementById('file2');
+        
+        let pdf1Doc = null;
+        let pdf2Doc = null;
+        let pdf1Bytes = null;
+        let pdf2Bytes = null;
+        
+        setupDropZone(dropZone1, file1, handlePDF1);
+        setupDropZone(dropZone2, file2, handlePDF2);
+        
+        function setupDropZone(zone, input, handler) {
+            zone.addEventListener('click', () => input.click());
+            
+            zone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+            
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+            
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'application/pdf') {
+                    handler(files[0]);
+                }
+            });
+            
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handler(e.target.files[0]);
+                }
+            });
+        }
+        
+        async function handlePDF1(file) {
+            try {
+                loading.style.display = 'block';
+                const arrayBuffer = await file.arrayBuffer();
+                pdf1Bytes = new Uint8Array(arrayBuffer);
+                pdf1Doc = await pdfjsLib.getDocument({ data: pdf1Bytes }).promise;
+                
+                renderGrid(pdf1Doc, 'grid1');
+                updateStats();
+                
+                document.getElementById('controlsBar').style.display = 'flex';
+                document.getElementById('previewSection').style.display = 'grid';
+                document.getElementById('statsBar').style.display = 'grid';
+                
+            } catch (error) {
+                console.error('Error loading PDF 1:', error);
+                alert('Error loading PDF 1. Please try again.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function handlePDF2(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                pdf2Bytes = new Uint8Array(arrayBuffer);
+                pdf2Doc = await pdfjsLib.getDocument({ data: pdf2Bytes }).promise;
+                
+                renderGrid(pdf2Doc, 'grid2');
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading PDF 2:', error);
+                alert('Error loading PDF 2. Please try again.');
+            }
+        }
+        
+        async function renderGrid(pdfDoc, gridId) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+            
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 0.25 });
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({
+                    canvasContext: canvas.getContext('2d'),
+                    viewport
+                }).promise;
+                
+                const thumb = document.createElement('div');
+                thumb.className = 'page-thumb';
+                thumb.innerHTML = `
+                    <img src="${canvas.toDataURL()}" alt="Page ${i}">
+                    <div class="page-num">Page ${i}</div>
+                `;
+                grid.appendChild(thumb);
+            }
+        }
+        
+        function updateStats() {
+            const p1 = pdf1Doc ? pdf1Doc.numPages : 0;
+            const p2 = pdf2Doc ? pdf2Doc.numPages : 0;
+            const total = p1 + p2;
+            
+            document.getElementById('pdf1Pages').textContent = p1;
+            document.getElementById('pdf2Pages').textContent = p2;
+            document.getElementById('totalPages').textContent = total;
+        }
+        
+        function clearAll() {
+            pdf1Doc = null;
+            pdf2Doc = null;
+            pdf1Bytes = null;
+            pdf2Bytes = null;
+            
+            document.getElementById('grid1').innerHTML = '';
+            document.getElementById('grid2').innerHTML = '';
+            document.getElementById('controlsBar').style.display = 'none';
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('statsBar').style.display = 'none';
+        }
+        
+        async function merge() {
+            if (!pdf1Bytes || !pdf2Bytes) {
+                alert('Please load both PDFs first');
+                return;
+            }
+            
+            try {
+                const src1 = await PDFDocument.load(pdf1Bytes);
+                const src2 = await PDFDocument.load(pdf2Bytes);
+                const newDoc = await PDFDocument.create();
+                
+                const pages1 = src1.getPageCount();
+                const pages2 = src2.getPageCount();
+                const order = document.getElementById('mergeOrder').value;
+                const batchSize = parseInt(document.getElementById('batchSize').value);
+                
+                let idx1 = 0, idx2 = 0;
+                let startWithPDF1 = order === '1-2-1-2';
+                
+                while (idx1 < pages1 || idx2 < pages2) {
+                    if (startWithPDF1) {
+                        for (let i = 0; i < batchSize && idx1 < pages1; i++) {
+                            const [page] = await newDoc.copyPages(src1, [idx1++]);
+                            newDoc.addPage(page);
+                        }
+                        for (let i = 0; i < batchSize && idx2 < pages2; i++) {
+                            const [page] = await newDoc.copyPages(src2, [idx2++]);
+                            newDoc.addPage(page);
+                        }
+                    } else {
+                        for (let i = 0; i < batchSize && idx2 < pages2; i++) {
+                            const [page] = await newDoc.copyPages(src2, [idx2++]);
+                            newDoc.addPage(page);
+                        }
+                        for (let i = 0; i < batchSize && idx1 < pages1; i++) {
+                            const [page] = await newDoc.copyPages(src1, [idx1++]);
+                            newDoc.addPage(page);
+                        }
+                    }
+                }
+                
+                const pdfBytes = await newDoc.save();
+                download(pdfBytes, 'alternately_merged.pdf');
+                
+            } catch (error) {
+                console.error('Merge error:', error);
+                alert('Error merging PDFs. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay PDF – Merge PDFs as Layers Online Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/overlay" />
+    <meta name="description" content="Overlay two PDF documents as transparent layers online. Combine forms, templates or diagrams. Free and browser-based.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%237c3aed'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --accent: #7c3aed; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .container { padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .box { background: var(--bg-card); padding: 24px; border-radius: 12px; margin-bottom: 20px; width: 100%; max-width: 500px; border: 1px dashed var(--border); text-align: center; }
+        input { display: none; }
+        .btn { padding: 8px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">Back to Home</a><div>Overlay Tool</div></header>
+    <div class="container">
+        <div class="box" id="b1">
+            <h3>Base PDF (Bottom Layer)</h3>
+            <button class="btn" onclick="document.getElementById('f1').click()">Select File</button>
+            <input type="file" id="f1" accept=".pdf">
+            <p id="n1" style="margin-top:8px;font-size:12px;color:var(--muted)"></p>
+        </div>
+        <div class="box" id="b2">
+            <h3>Overlay PDF (Top Layer)</h3>
+            <button class="btn" onclick="document.getElementById('f2').click()">Select File</button>
+            <input type="file" id="f2" accept=".pdf">
+            <p id="n2" style="margin-top:8px;font-size:12px;color:var(--muted)"></p>
+        </div>
+        <button class="btn" style="padding:14px 28px;font-size:16px;" onclick="merge()">Merge Overlay</button>
+    </div>
+    <script>
+        const { PDFDocument } = PDFLib;
+        let baseDoc = null, overlayDoc = null;
+
+        document.getElementById('f1').onchange = async (e) => {
+            baseDoc = await PDFDocument.load(await e.target.files[0].arrayBuffer());
+            document.getElementById('n1').textContent = e.target.files[0].name;
+        };
+        document.getElementById('f2').onchange = async (e) => {
+            overlayDoc = await PDFDocument.load(await e.target.files[0].arrayBuffer());
+            document.getElementById('n2').textContent = e.target.files[0].name;
+        };
+
+        async function merge() {
+            if(!baseDoc || !overlayDoc) return alert("Select both files");
+            
+            const newDoc = await PDFDocument.create();
+            const basePages = newDoc.copyPages(baseDoc, baseDoc.getPageIndices());
+            const overlayPages = await newDoc.embedPdf(overlayDoc); // Embeds whole doc for reference
+            
+            // Overlay page 1 of overlayDoc onto every page of baseDoc
+            basePages.forEach((page, idx) => {
+                newDoc.addPage(page);
+                // Draw first page of overlay on top
+                // Note: In a real app you'd match page indices
+                page.drawPage(overlayPages[0], { x: 0, y: 0, width: page.getWidth(), height: page.getHeight() });
+            });
+
+            const bytes = await newDoc.save();
+            download(bytes, "overlay_result.pdf");
+        }
+
+        function download(data, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data])); a.download = name; a.click(); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test – PDF Validator | 4uPDF</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://4updf-all.vercel.app/test-pdf-valid" />
+    <meta name="description" content="Internal PDF validator test page.">
+    <style>
+        :root {
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        h1 { 
+            text-align: center; 
+            margin-bottom: 10px; 
+            font-size: 2rem; 
+            color: var(--info);
+        }
+        
+        .subtitle { 
+            text-align: center; 
+            color: var(--muted); 
+            margin-bottom: 40px;
+        }
+        
+        .upload-area {
+            background: var(--bg-card);
+            border: 3px dashed var(--muted);
+            border-radius: 16px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 30px;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--info);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .upload-subtext {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        
+        #fileInput { display: none; }
+        
+        .result-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result-card.success { border: 2px solid var(--success); }
+        .result-card.error { border: 2px solid var(--error); }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .result-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .success .result-icon { background: var(--success); }
+        .error .result-icon { background: var(--error); }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .check-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .check-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .check-list li:last-child { border-bottom: none; }
+        
+        .check-icon {
+            font-size: 1.2rem;
+        }
+        
+        .success .check-icon { color: var(--success); }
+        .error .check-icon { color: var(--error); }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--info), #1d4ed8);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover { transform: translateY(-2px); }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+        
+        .console-output {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--muted);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin-top: 15px;
+        }
+        
+        .tips {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--info);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF File Validator</h1>
+        <p class="subtitle">Test if your file is a valid PDF before using watermark remover or sign tool</p>
+        
+        <!-- Upload Area -->
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Click to select PDF file</div>
+            <div class="upload-subtext">or drag and drop here</div>
+            <input type="file" id="fileInput" accept=".pdf,application/pdf" onchange="validateFile(this.files[0])">
+        </div>
+        
+        <!-- Result Card -->
+        <div id="resultCard" class="result-card">
+            <div class="result-header">
+                <div class="result-icon" id="resultIcon"></div>
+                <div id="resultTitle"></div>
+            </div>
+            
+            <div class="info-grid" id="infoGrid"></div>
+            
+            <ul class="check-list" id="checkList"></ul>
+            
+            <div class="tips" id="tipsBox"></div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="watermark-remover.html" class="btn btn-success" id="useTool" style="display: none;">
+                    🧹 Open Watermark Remover →
+                </a>
+                <a href="sign.html" class="btn btn-success" id="useSignTool" style="display: none;">
+                    ✍️ Open Sign Tool →
+                </a>
+                <button class="btn" onclick="resetValidator()">Test Another File</button>
+            </div>
+            
+            <div class="console-output" id="consoleOutput"></div>
+        </div>
+    </div>
+    
+    <script>
+        function validateFile(file) {
+            const resultCard = document.getElementById('resultCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const infoGrid = document.getElementById('infoGrid');
+            const checkList = document.getElementById('checkList');
+            const tipsBox = document.getElementById('tipsBox');
+            const useTool = document.getElementById('useTool');
+            const useSignTool = document.getElementById('useSignTool');
+            const consoleOutput = document.getElementById('consoleOutput');
+            
+            // Reset display
+            resultCard.style.display = 'block';
+            resultCard.className = 'result-card';
+            useTool.style.display = 'none';
+            useSignTool.style.display = 'none';
+            
+            const logs = [];
+            logs.push(`File selected: ${file.name}`);
+            logs.push(`File type: ${file.type}`);
+            logs.push(`File size: ${file.size} bytes (${(file.size / 1024).toFixed(2)} KB)`);
+            
+            // Check 1: File size
+            if (file.size === 0) {
+                showError('❌ File is empty (0 bytes)', 'The file you selected is completely empty.', logs);
+                return;
+            }
+            
+            if (file.size < 5) {
+                showError('❌ File is too small', `A valid PDF must be at least 5 bytes. This file is only ${file.size} bytes.`, logs);
+                return;
+            }
+            
+            logs.push(`✓ File size OK: ${file.size} bytes`);
+            
+            // Check 2: Read file and validate header
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const pdfBytes = new Uint8Array(e.target.result);
+                    logs.push(`Read ${pdfBytes.length} bytes from file`);
+                    
+                    // Get first 5 bytes as string
+                    const header = String.fromCharCode.apply(null, pdfBytes.slice(0, 5));
+                    logs.push(`PDF Header check: "${header}"`);
+                    logs.push(`Header as hex: ${Array.from(pdfBytes.slice(0, 5)).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ')}`);
+                    
+                    // Check if starts with %PDF
+                    if (!header.startsWith('%PDF')) {
+                        let cause = '';
+                        if (header.startsWith('PK')) {
+                            cause = 'This looks like a ZIP/Office file (starts with "PK"), not a PDF.';
+                        } else if (header.startsWith('‰PNG')) {
+                            cause = 'This looks like a PNG image file, not a PDF.';
+                        } else if (header.startsWith('<!DOC') || header.startsWith('<!HTML')) {
+                            cause = 'This looks like an HTML file, not a PDF.';
+                        } else {
+                            cause = `File starts with "${header}" instead of "%PDF".`;
+                        }
+                        
+                        showError('❌ Not a Valid PDF', 
+                            `${cause}\n\nThis file does not have the required %PDF header that all PDF files must have.`,
+                            logs);
+                        return;
+                    }
+                    
+                    logs.push('✓ Valid PDF header detected: ' + header);
+                    
+                    // All checks passed!
+                    showSuccess(file, pdfBytes.length, header, logs);
+                    
+                } catch (error) {
+                    logs.push(`❌ Error reading file: ${error.message}`);
+                    showError('❌ Error Reading File', error.message, logs);
+                }
+            };
+            
+            reader.onerror = function() {
+                showError('❌ Could not read file', 'An error occurred while trying to read the file.', logs);
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function showSuccess(file, size, header, logs) {
+            const resultCard = document.getElementById('resultCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const infoGrid = document.getElementById('infoGrid');
+            const checkList = document.getElementById('checkList');
+            const tipsBox = document.getElementById('tipsBox');
+            const useTool = document.getElementById('useTool');
+            const useSignTool = document.getElementById('useSignTool');
+            const consoleOutput = document.getElementById('consoleOutput');
+            
+            resultCard.classList.add('success');
+            resultIcon.innerHTML = '✓';
+            resultTitle.innerHTML = '✅ Valid PDF File Detected!';
+            resultTitle.style.color = 'var(--success)';
+            
+            infoGrid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">File Name</div>
+                    <div class="info-value">${file.name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">File Size</div>
+                    <div class="info-value">${(size / 1024).toFixed(2)} KB</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">PDF Version</div>
+                    <div class="info-value">${header}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value" style="color: var(--success);">Valid PDF ✓</div>
+                </div>
+            `;
+            
+            checkList.innerHTML = `
+                <li><span class="check-icon">✓</span> File has valid PDF header (%PDF)</li>
+                <li><span class="check-icon">✓</span> File size is adequate</li>
+                <li><span class="check-icon">✓</span> File can be read successfully</li>
+                <li><span class="check-icon">✓</span> Ready to use with PDF tools</li>
+            `;
+            
+            tipsBox.innerHTML = `
+                <strong>✨ Great! This is a valid PDF file.</strong><br>
+                You can safely use this file with both the Watermark Remover and Sign Tool.
+            `;
+            
+            useTool.style.display = 'inline-block';
+            useSignTool.style.display = 'inline-block';
+            consoleOutput.textContent = logs.join('\n');
+        }
+        
+        function showError(title, message, logs) {
+            const resultCard = document.getElementById('resultCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const infoGrid = document.getElementById('infoGrid');
+            const checkList = document.getElementById('checkList');
+            const tipsBox = document.getElementById('tipsBox');
+            const consoleOutput = document.getElementById('consoleOutput');
+            
+            resultCard.classList.add('error');
+            resultIcon.innerHTML = '✗';
+            resultTitle.innerHTML = title;
+            resultTitle.style.color = 'var(--error)';
+            
+            infoGrid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Problem</div>
+                    <div class="info-value" style="color: var(--error);">Invalid File</div>
+                </div>
+            `;
+            
+            checkList.innerHTML = `
+                <li><span class="check-icon">✗</span> ${message.replace(/\n/g, '<br>')}</li>
+            `;
+            
+            tipsBox.innerHTML = `
+                <strong style="color: var(--error);">⚠️ DO NOT use this file with PDF tools!</strong><br><br>
+                <strong>To fix this:</strong><br>
+                1. Make sure the file is actually a PDF<br>
+                2. Try opening it in Adobe Reader first<br>
+                3. If it doesn't open → file is not a valid PDF<br>
+                4. Use a different file or re-download the PDF
+            `;
+            
+            consoleOutput.textContent = logs.join('\n');
+        }
+        
+        function resetValidator() {
+            document.getElementById('resultCard').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+        }
+        
+        // Drag and drop support
+        const uploadArea = document.querySelector('.upload-area');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.style.borderColor = 'var(--info)', false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.style.borderColor = '', false);
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                validateFile(files[0]);
+            }
+        });
+    </script>
+</body>
+</html>

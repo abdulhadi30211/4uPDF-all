@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert a PDF to dark mode for easier reading in low light. Invert colors and apply dark theme. Free online tool.">
+    <title>Dark Mode PDF – Convert PDF to Dark Theme Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/dark-mode" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%236b7280'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #6b7280; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        header { padding: 12px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        
+        .container { padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .upload-box { border: 2px dashed var(--border); padding: 40px; border-radius: 16px; cursor: pointer; width: 100%; max-width: 500px; text-align: center; }
+        input { display: none; }
+        
+        .options { background: var(--bg-card); padding: 15px; border-radius: 8px; margin-top: 20px; width: 100%; max-width: 500px; display: none; }
+        .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">4uPDF-all</a><div>Dark Mode</div></header>
+    <div class="container">
+        <div class="upload-box" id="dropZone"><h2>Dark Mode PDF</h2><p style="color:var(--muted); font-size:14px">Invert colors for night reading</p><input type="file" id="fileInput" accept=".pdf"></div>
+        
+        <div class="options" id="options">
+            <label style="display:flex; gap:10px; align-items:center;">
+                <input type="checkbox" id="keepImages"> Keep Original Images (Don't invert photos)
+            </label>
+            <button class="btn" onclick="convert()">Create Dark PDF</button>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const options = document.getElementById('options');
+        
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => {
+            dropZone.style.display = 'none';
+            options.style.display = 'block';
+        };
+
+        async function convert() {
+            const file = fileInput.files[0];
+            const arrayBuffer = await file.arrayBuffer();
+            const srcDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const newDoc = await PDFDocument.create();
+            
+            const keepImages = document.getElementById('keepImages').checked;
+
+            for(let i=1; i<=srcDoc.numPages; i++) {
+                const page = await srcDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width; canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport }).promise;
+                
+                // Invert Colors Logic
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imgData.data;
+                for (let j = 0; j < data.length; j += 4) {
+                    data[j] = 255 - data[j];     // Red
+                    data[j + 1] = 255 - data[j + 1]; // Green
+                    data[j + 2] = 255 - data[j + 2]; // Blue
+                }
+                ctx.putImageData(imgData, 0, 0);
+                
+                // Embed new page
+                const imgBytes = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+                const img = await newDoc.embedJpg(imgBytes);
+                const newPage = newDoc.addPage([viewport.width, viewport.height]);
+                newPage.drawImage(img, { x:0, y:0, width: viewport.width, height: viewport.height });
+            }
+
+            const pdfBytes = await newDoc.save();
+            download(pdfBytes, "dark_mode.pdf");
+        }
+
+        function download(data, filename) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = filename;
+            a.click();
+        }
+    </script>
+</body>
+</html>

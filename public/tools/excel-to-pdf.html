@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert Excel XLSX spreadsheets to PDF online. Preserve layout and formatting, no software required. Free and secure.">
+    <title>Excel to PDF – Convert XLSX to PDF Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/excel-to-pdf" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%2316a34a'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #16a34a; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        header { padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--bg-card); }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .upload-box { border: 2px dashed var(--border); padding: 40px; border-radius: 16px; cursor: pointer; width: 100%; max-width: 500px; text-align: center; }
+        input { display: none; }
+        
+        .options { margin-top: 20px; background: var(--bg-card); padding: 20px; border-radius: 12px; width: 100%; max-width: 600px; display: none; }
+        .sheet-list { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .sheet-btn { padding: 6px 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 20px; cursor: pointer; font-size: 12px; }
+        .sheet-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        
+        .preview-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; color: black; background: white; }
+        .preview-table th, .preview-table td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
+        
+        .btn { padding: 10px 20px; background: var(--accent); color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">4uPDF-all</a><div>Excel to PDF</div></header>
+    <div class="container">
+        <div class="upload-box" id="dropZone"><h2>Convert Excel to PDF</h2><input type="file" id="fileInput" accept=".xlsx, .xls"></div>
+        
+        <div class="options" id="opts">
+            <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px;">
+                <label>Sheets:</label>
+                <div class="sheet-list" id="sheetList"></div>
+            </div>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <label>Orientation:</label>
+                <select id="orient">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                </select>
+            </div>
+            <div id="tablePreview"></div>
+            <button class="btn" onclick="convert()">Download PDF</button>
+        </div>
+    </div>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const opts = document.getElementById('opts');
+        
+        let workbook = null;
+        let activeSheet = null;
+
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+        async function handleFile(file) {
+            const data = await file.arrayBuffer();
+            workbook = XLSX.read(data, { type: 'array' });
+            
+            dropZone.style.display = 'none';
+            opts.style.display = 'block';
+            
+            const sheetList = document.getElementById('sheetList');
+            sheetList.innerHTML = workbook.SheetNames.map(name => 
+                `<button class="sheet-btn ${name === workbook.SheetNames[0] ? 'active' : ''}" onclick="selectSheet('${name}')">${name}</button>`
+            ).join('');
+            
+            selectSheet(workbook.SheetNames[0]);
+        }
+
+        window.selectSheet = (name) => {
+            activeSheet = name;
+            // Update UI
+            document.querySelectorAll('.sheet-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Render Preview
+            const sheet = workbook.Sheets[name];
+            const html = XLSX.utils.sheet_to_html(sheet, { id: 'mytable' });
+            document.getElementById('tablePreview').innerHTML = html;
+            
+            // Style the table
+            const table = document.getElementById('mytable');
+            if(table) table.className = 'preview-table';
+        };
+
+        async function convert() {
+            const orient = document.getElementById('orient').value;
+            const elem = document.getElementById('tablePreview');
+            
+            const opt = {
+                margin: 5, filename: 'excel_converted.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: orient }
+            };
+            await html2pdf().set(opt).from(elem).save();
+        }
+    </script>
+</body>
+</html>

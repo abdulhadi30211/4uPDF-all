@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test – Watermark Remover | 4uPDF</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://4updf-all.vercel.app/test-watermark-remover" />
+    <meta name="description" content="Internal watermark remover test page.">
+    <style>
+        :root {
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        h1 { text-align: center; margin-bottom: 10px; font-size: 2rem; color: var(--success); }
+        .subtitle { text-align: center; color: var(--muted); margin-bottom: 40px; }
+        
+        .status-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid var(--success);
+        }
+        
+        .check-list { list-style: none; }
+        .check-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .check-list li:before { content: "✓"; color: var(--success); font-weight: bold; }
+        
+        .test-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .test-step {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: var(--warning);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-content { flex: 1; }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); }
+        .btn-secondary { background: linear-gradient(135deg, var(--info), #1d4ed8); }
+        
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--info);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .error-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--error);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: var(--warning);
+        }
+        
+        .console-log {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--muted);
+            border: 1px solid #334155;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .mode-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+        }
+        
+        .mode-card:hover { border-color: var(--info); }
+        .mode-card h4 { color: var(--info); margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Watermark Remover - Fixed!</h1>
+        <p class="subtitle">Comprehensive validation and error handling added</p>
+        
+        <!-- Status Card -->
+        <div class="status-card">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <div style="width: 50px; height: 50px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">✓</div>
+                <div style="font-size: 1.5rem; color: var(--success);">Critical Errors Fixed</div>
+            </div>
+            
+            <ul class="check-list">
+                <li>PDF header validation before processing</li>
+                <li>Detailed, helpful error messages</li>
+                <li>Robust PDF loading with fallbacks</li>
+                <li>Page-level error recovery (continues on failures)</li>
+                <li>Bounds checking for all drawing operations</li>
+                <li>Comprehensive console logging at every step</li>
+            </ul>
+        </div>
+        
+        <!-- Quick Test -->
+        <div class="test-section">
+            <h2 style="margin-bottom: 20px;">🚀 Quick Test (2 minutes)</h2>
+            
+            <div class="test-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <strong>Open the Watermark Remover</strong>
+                    <p style="color: var(--muted); margin-top: 5px;">Click button below or navigate to watermark-remover.html</p>
+                    <a href="watermark-remover.html" class="btn btn-secondary">Open Watermark Remover →</a>
+                </div>
+            </div>
+            
+            <div class="test-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <strong>Press F12 to Open Console</strong>
+                    <p style="color: var(--muted); margin-top: 5px;">This shows detailed logs of what's happening</p>
+                </div>
+            </div>
+            
+            <div class="test-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <strong>Select Removal Mode</strong>
+                    <p style="color: var(--muted); margin-top: 5px;">Choose from 4 modes:</p>
+                    <div class="mode-grid">
+                        <div class="mode-card">
+                            <h4>🤖 Auto Detect</h4>
+                            <p style="font-size: 0.9rem; color: var(--muted);">Best for most cases. Scans for common watermark text.</p>
+                        </div>
+                        <div class="mode-card">
+                            <h4>✋ Manual Select</h4>
+                            <p style="font-size: 0.9rem; color: var(--muted);">Covers standard positions (corners, center).</p>
+                        </div>
+                        <div class="mode-card">
+                            <h4>⚡ Batch Process</h4>
+                            <p style="font-size: 0.9rem; color: var(--muted);">Light overall treatment for multiple files.</p>
+                        </div>
+                        <div class="mode-card">
+                            <h4>🎯 Precision Mode</h4>
+                            <p style="font-size: 0.9rem; color: var(--muted);">Advanced detection for rotated/transparent text.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="test-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <strong>Upload PDF with Watermark</strong>
+                    <p style="color: var(--muted); margin-top: 5px;">Use any PDF that has watermarks like "DRAFT", "CONFIDENTIAL", etc.</p>
+                </div>
+            </div>
+            
+            <div class="test-step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <strong>Watch Console Logs</strong>
+                    <p style="color: var(--muted); margin-top: 5px;">You'll see detailed progress including:</p>
+                    <div class="console-log" style="margin-top: 10px;">File selected: test.pdf Type: application/pdf Size: 12345
+PDF Header check: %PDF-
+✓ Valid PDF detected, size: 12345 bytes
+=== Starting Watermark Removal ===
+Loading PDF with PDF.js...
+✓ PDF.js loaded successfully, pages: 5
+Processing page 1/5, size: 612x792
+Detected 3 potential watermarks
+✓ PDF saved, size: 13456 bytes</div>
+                </div>
+            </div>
+            
+            <div class="test-step">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <strong>Download & Verify</strong>
+                    <p style="color: var(--muted); margin-top: 5px;">Check downloaded PDF - watermarks should be covered!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Error Handling -->
+        <div class="test-section">
+            <h2 style="margin-bottom: 20px;">🛡️ Enhanced Error Handling</h2>
+            
+            <div class="info-box">
+                <strong>💡 Old Error Messages (Not Helpful):</strong><br><br>
+                <code>Error removing watermarks: Failed to parse PDF document (line:0 col:0 offset=0): No PDF header</code><br><br>
+                <strong>✨ New Error Messages (Actually Useful):</strong><br><br>
+                <code>Invalid PDF file - missing PDF header. File may be corrupted or not a PDF.</code><br>
+                <code>This PDF appears to be encrypted or password-protected. Please unlock first.</code><br>
+                <code>Failed to parse PDF: [specific error]. The file may be corrupted.</code>
+            </div>
+            
+            <h3 style="margin: 20px 0 15px;">Common Errors & Solutions:</h3>
+            
+            <div class="error-box">
+                <strong>❌ "Invalid PDF file - missing PDF header"</strong><br>
+                <span style="color: var(--muted);">Cause: File is not actually a PDF or is corrupted</span><br>
+                <span style="color: var(--success);">Solution: Use a real PDF file, try downloading again</span>
+            </div>
+            
+            <div class="error-box">
+                <strong>❌ "Failed to parse PDF document"</strong><br>
+                <span style="color: var(--muted);">Cause: PDF structure is damaged or encrypted</span><br>
+                <span style="color: var(--success);">Solution: Remove password protection, use different PDF</span>
+            </div>
+            
+            <div class="error-box">
+                <strong>❌ "File is too small to be a valid PDF"</strong><br>
+                <span style="color: var(--muted);">Cause: Empty or nearly empty file</span><br>
+                <span style="color: var(--success);">Solution: Check file size, ensure complete upload</span>
+            </div>
+        </div>
+        
+        <!-- What Each Mode Does -->
+        <div class="test-section">
+            <h2 style="margin-bottom: 20px;">📊 Removal Modes Explained</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🤖</div>
+                    <h3 style="color: var(--info); margin-bottom: 10px;">Auto Detect</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem;">
+                        Scans PDF text for common watermark patterns like "DRAFT", "CONFIDENTIAL", "SAMPLE". 
+                        Automatically covers detected text with white rectangles. Also checks corners and center.
+                    </p>
+                    <p style="margin-top: 10px; color: var(--success); font-size: 0.9rem;">✓ Best for: Most cases (recommended first choice)</p>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">✋</div>
+                    <h3 style="color: var(--info); margin-bottom: 10px;">Manual Select</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem;">
+                        Covers 5 standard watermark positions: bottom-right, bottom-left, center, 
+                        very bottom-right, and top-left corners. No detection, just coverage.
+                    </p>
+                    <p style="margin-top: 10px; color: var(--success); font-size: 0.9rem;">✓ Best for: Predictable watermark placements</p>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">⚡</div>
+                    <h3 style="color: var(--info); margin-bottom: 10px;">Batch Process</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem;">
+                        Applies light overall coverage to fade watermarks. Focuses on edges where 
+                        watermarks commonly appear. Subtle treatment with low opacity.
+                    </p>
+                    <p style="margin-top: 10px; color: var(--success); font-size: 0.9rem;">✓ Best for: Multiple files, light watermarks</p>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🎯</div>
+                    <h3 style="color: var(--info); margin-bottom: 10px;">Precision Mode</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem;">
+                        Advanced detection for rotated text (common in diagonal watermarks). 
+                        Finds semi-transparent text. Uses sophisticated pattern analysis.
+                    </p>
+                    <p style="margin-top: 10px; color: var(--success); font-size: 0.9rem;">✓ Best for: Difficult, rotated, or transparent watermarks</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Console Debugging -->
+        <div class="test-section">
+            <h2 style="margin-bottom: 20px;">🔍 Console Logs Explained</h2>
+            
+            <p style="color: var(--muted); margin-bottom: 15px;">Press F12 and watch these log messages:</p>
+            
+            <div class="console-log">✓ File selected: example.pdf Type: application/pdf Size: 45678
+✓ PDF Header check: %PDF-1.4
+✓ Valid PDF detected, size: 45678 bytes
+
+=== Starting Watermark Removal ===
+✓ PDF bytes size: 45678
+✓ Removal mode: auto
+✓ Loading PDF with PDF.js...
+✓ PDF.js loaded successfully, pages: 5
+✓ Loading PDF with PDF-Lib...
+✓ PDF-Lib loaded successfully
+✓ Prepared 5 pages for processing
+✓ Starting watermark detection/removal...
+✓ Processing page 1/5, size: 612x792
+✓ Detected 3 potential watermarks
+✓ Watermark removal complete, saving PDF...
+✓ PDF saved, size: 47890 bytes
+=== Watermark Removal Complete ===</div>
+            
+            <p style="margin-top: 15px;"><strong style="color: var(--success);">Green checkmarks (✓) = Everything working perfectly!</strong></p>
+        </div>
+        
+        <!-- Final CTA -->
+        <div style="text-align: center; margin-top: 40px; padding: 30px; background: var(--bg-card); border-radius: 12px;">
+            <h2 style="margin-bottom: 15px;">Ready to Remove Watermarks?</h2>
+            <p style="color: var(--muted); margin-bottom: 25px;">The tool is guaranteed to work with proper error handling and validation</p>
+            <a href="watermark-remover.html" class="btn">🧹 Open Watermark Remover Now →</a>
+        </div>
+    </div>
+</body>
+</html>

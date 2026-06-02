@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organize PDF – Manage PDF Pages Online Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="Organize PDF pages – reorder, rotate, delete or extract with a visual drag-and-drop interface. Free online PDF organizer.">
+    <meta name="keywords" content="organize pdf, rearrange pages, pdf page sorter, visual pdf editor, drag drop pdf, pdf page manager, reorder pdf pages, free pdf organizer">
+    <link rel="canonical" href="https://4updf-all.vercel.app/organize" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Organize PDF - Visual Page Arranger">
+    <meta property="og:description" content="Drag and drop to organize PDF pages. Rearrange, rotate, delete with ease.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://4updf-all.com/assets/organize-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%230ea5e9'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #0ea5e9;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+        
+        .upload-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: rgba(14, 165, 233, 0.05);
+        }
+        
+        .upload-box.dragover {
+            border-color: var(--accent);
+            background: rgba(14, 165, 233, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn-main {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+        }
+        
+        .controls-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: none;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-sm {
+            background: var(--border);
+            border: none;
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-sm:hover {
+            background: var(--accent);
+        }
+        
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .page-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: move;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .page-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .page-card.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+        }
+        
+        .page-card.dragging {
+            opacity: 0.5;
+        }
+        
+        .page-card img {
+            width: 100%;
+            height: 240px;
+            object-fit: contain;
+            background: white;
+        }
+        
+        .page-info {
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-number {
+            font-weight: 600;
+            color: var(--muted);
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            background: var(--border);
+            border: none;
+            color: var(--text);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: var(--accent);
+        }
+        
+        .action-btn.delete:hover {
+            background: #ef4444;
+        }
+        
+        .stats-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .feature-desc {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .pages-grid { grid-template-columns: repeat(2, 1fr); }
+            .page-card img { height: 180px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">4uPDF-all</a>
+        <nav>
+            <button class="btn-main" onclick="save()">Save PDF</button>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Organize PDF Pages</h1>
+            <p class="subtitle">Drag & drop to rearrange • Rotate • Delete • Reorder</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-box" id="dropZone">
+                <div class="upload-icon">📄</div>
+                <h2>Upload PDF to Organize</h2>
+                <p style="color: var(--muted); margin: 15px 0;">Drag & drop or click to browse</p>
+                <button class="btn-main">Select PDF File</button>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading PDF pages...</p>
+        </div>
+        
+        <div class="controls-bar" id="controlsBar">
+            <button class="btn-sm" onclick="selectAll()">Select All</button>
+            <button class="btn-sm" onclick="deselectAll()">Deselect All</button>
+            <button class="btn-sm" onclick="rotateLeft()">⟲ Rotate Left</button>
+            <button class="btn-sm" onclick="rotateRight()">⟳ Rotate Right</button>
+            <button class="btn-sm" onclick="deleteSelected()">🗑️ Delete Selected</button>
+            <button class="btn-sm" onclick="resetAll()">Reset</button>
+        </div>
+        
+        <div class="pages-grid" id="pagesGrid"></div>
+        
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalPages">0</div>
+                <div class="stat-label">Total Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="visiblePages">0</div>
+                <div class="stat-label">Visible Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="rotatedPages">0</div>
+                <div class="stat-label">Rotated Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="deletedPages">0</div>
+                <div class="stat-label">Deleted Pages</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Visual Organization</h3>
+                <p class="feature-desc">See all pages as thumbnails and rearrange them with simple drag-and-drop. What you see is what you get.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Batch Operations</h3>
+                <p class="feature-desc">Select multiple pages and apply rotations, deletions, or other actions to all selected pages at once.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">100% Secure</h3>
+                <p class="feature-desc">Your PDFs never leave your browser. All processing happens locally on your device. Zero privacy risks.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3 class="feature-title">Lossless Quality</h3>
+                <p class="feature-desc">Maintain original PDF quality throughout the organization process. No compression or quality loss.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument, degrees } = PDFLib;
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const pagesGrid = document.getElementById('pagesGrid');
+        const controlsBar = document.getElementById('controlsBar');
+        const statsBar = document.getElementById('statsBar');
+        const loading = document.getElementById('loading');
+        
+        let pdfLibDoc = null;
+        let pdfJsDoc = null;
+        let pagesState = [];
+        let draggedElement = null;
+        
+        // Drag & Drop
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        async function handleFile(file) {
+            try {
+                loading.style.display = 'block';
+                dropZone.style.display = 'none';
+                
+                const arrayBuffer = await file.arrayBuffer();
+                pdfJsDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                pdfLibDoc = await PDFDocument.load(arrayBuffer);
+                
+                pagesState = Array.from({ length: pdfJsDoc.numPages }, (_, i) => ({
+                    id: `page-${i}-${Date.now()}`,
+                    originalIndex: i,
+                    rotation: 0,
+                    deleted: false,
+                    selected: false
+                }));
+                
+                await renderPages();
+                
+                controlsBar.style.display = 'flex';
+                statsBar.style.display = 'grid';
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF. Please try again.');
+                loading.style.display = 'none';
+                dropZone.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function renderPages() {
+            pagesGrid.innerHTML = '';
+            
+            for (let i = 0; i < pagesState.length; i++) {
+                const pageState = pagesState[i];
+                if (pageState.deleted) continue;
+                
+                const pageView = await pdfJsDoc.getPage(pageState.originalIndex + 1);
+                const viewport = pageView.getViewport({ scale: 0.25, rotation: pageState.rotation });
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await pageView.render({
+                    canvasContext: canvas.getContext('2d'),
+                    viewport
+                }).promise;
+                
+                const card = document.createElement('div');
+                card.className = 'page-card';
+                if (pageState.selected) card.classList.add('selected');
+                card.draggable = true;
+                card.dataset.index = i;
+                
+                card.innerHTML = `
+                    <img src="${canvas.toDataURL()}" alt="Page ${i + 1}">
+                    <div class="page-info">
+                        <span class="page-number">Page ${i + 1}</span>
+                        <div class="page-actions">
+                            <button class="action-btn" onclick="rotatePage(${i})" title="Rotate">⟲</button>
+                            <button class="action-btn delete" onclick="deletePage(${i})" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                
+                addDragEvents(card);
+                pagesGrid.appendChild(card);
+            }
+        }
+        
+        function addDragEvents(card) {
+            card.addEventListener('dragstart', (e) => {
+                draggedElement = card;
+                card.classList.add('dragging');
+            });
+            
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                draggedElement = null;
+            });
+            
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            card.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (draggedElement !== card) {
+                    const fromIndex = parseInt(draggedElement.dataset.index);
+                    const toIndex = parseInt(card.dataset.index);
+                    swapPages(fromIndex, toIndex);
+                }
+            });
+        }
+        
+        function swapPages(fromIndex, toIndex) {
+            const filteredState = pagesState.filter(p => !p.deleted);
+            const temp = filteredState[fromIndex];
+            filteredState.splice(fromIndex, 1);
+            filteredState.splice(toIndex, 0, temp);
+            
+            let filteredIndex = 0;
+            for (let i = 0; i < pagesState.length; i++) {
+                if (!pagesState[i].deleted) {
+                    pagesState[i] = filteredState[filteredIndex];
+                    filteredIndex++;
+                }
+            }
+            
+            renderPages();
+            updateStats();
+        }
+        
+        function selectAll() {
+            pagesState.forEach(p => p.selected = true);
+            renderPages();
+        }
+        
+        function deselectAll() {
+            pagesState.forEach(p => p.selected = false);
+            renderPages();
+        }
+        
+        function toggleSelect(index) {
+            const filteredIndex = parseInt(index);
+            pagesState[filteredIndex].selected = !pagesState[filteredIndex].selected;
+            renderPages();
+        }
+        
+        function rotateLeft() {
+            pagesState.filter(p => p.selected).forEach(p => {
+                p.rotation = (p.rotation - 90 + 360) % 360;
+            });
+            renderPages();
+            updateStats();
+        }
+        
+        function rotateRight() {
+            pagesState.filter(p => p.selected).forEach(p => {
+                p.rotation = (p.rotation + 90) % 360;
+            });
+            renderPages();
+            updateStats();
+        }
+        
+        function rotatePage(index) {
+            pagesState[index].rotation = (pagesState[index].rotation + 90) % 360;
+            renderPages();
+            updateStats();
+        }
+        
+        function deleteSelected() {
+            pagesState.filter(p => p.selected).forEach(p => p.deleted = true);
+            renderPages();
+            updateStats();
+        }
+        
+        function deletePage(index) {
+            pagesState[index].deleted = true;
+            renderPages();
+            updateStats();
+        }
+        
+        function resetAll() {
+            pagesState.forEach(p => {
+                p.rotation = 0;
+                p.deleted = false;
+                p.selected = false;
+            });
+            renderPages();
+            updateStats();
+        }
+        
+        function updateStats() {
+            const total = pagesState.length;
+            const visible = pagesState.filter(p => !p.deleted).length;
+            const rotated = pagesState.filter(p => p.rotation !== 0 && !p.deleted).length;
+            const deleted = pagesState.filter(p => p.deleted).length;
+            
+            document.getElementById('totalPages').textContent = total;
+            document.getElementById('visiblePages').textContent = visible;
+            document.getElementById('rotatedPages').textContent = rotated;
+            document.getElementById('deletedPages').textContent = deleted;
+        }
+        
+        async function save() {
+            if (!pdfLibDoc) {
+                alert('Please load a PDF first');
+                return;
+            }
+            
+            try {
+                const newPdf = await PDFDocument.create();
+                
+                for (const pageState of pagesState) {
+                    if (!pageState.deleted) {
+                        const [copiedPage] = await newPdf.copyPages(pdfLibDoc, [pageState.originalIndex]);
+                        if (pageState.rotation !== 0) {
+                            copiedPage.setRotation(degrees(pageState.rotation));
+                        }
+                        newPdf.addPage(copiedPage);
+                    }
+                }
+                
+                const pdfBytes = await newPdf.save();
+                download(pdfBytes, 'organized.pdf');
+                
+            } catch (error) {
+                console.error('Error saving PDF:', error);
+                alert('Error saving PDF. Please try again.');
+            }
+        }
+        
+        function download(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

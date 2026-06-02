@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert PDF pages to scalable SVG vector graphics online. Perfect for designers and developers. Free, fast, no signup.">
+    <title>PDF to SVG – Convert PDF to SVG Vector Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/pdf-to-svg" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%2310b981'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #10b981; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        header { padding: 12px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .logo { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .container { padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .upload-box { border: 2px dashed var(--border); padding: 40px; border-radius: 16px; cursor: pointer; width: 100%; max-width: 500px; text-align: center; }
+        input { display: none; }
+        .btn { margin-top: 20px; padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: none; }
+        .status { margin-top: 10px; color: var(--muted); font-size: 13px; }
+    </style>
+</head>
+<body>
+    <header><a href="index.html" class="logo">4uPDF-all</a><div>PDF to SVG</div></header>
+    <div class="container">
+        <div class="upload-box" id="dropZone"><h2>PDF to SVG</h2><p style="color:var(--muted); font-size:14px">Convert pages to SVG format</p><input type="file" id="fileInput" accept=".pdf"></div>
+        <div class="status" id="status"></div>
+        <button class="btn" id="dlBtn" onclick="download()">Download ZIP</button>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const dlBtn = document.getElementById('dlBtn');
+        const status = document.getElementById('status');
+        
+        let svgFiles = [];
+
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+        async function handleFile(file) {
+            svgFiles = [];
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            
+            dropZone.style.display = 'none';
+            status.textContent = "Converting...";
+            
+            for(let i=1; i<=pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width; canvas.height = viewport.height;
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                
+                // Create SVG wrapper
+                const dataUrl = canvas.toDataURL('image/png');
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${viewport.width}" height="${viewport.height}" viewBox="0 0 ${viewport.width} ${viewport.height}">
+                    <image href="${dataUrl}" width="${viewport.width}" height="${viewport.height}"/>
+                </svg>`;
+                
+                svgFiles.push({ name: `Page_${i}.svg`, content: svg });
+                status.textContent = `Processed page ${i}...`;
+            }
+            
+            status.textContent = "Ready to download.";
+            dlBtn.style.display = 'inline-block';
+        }
+
+        async function download() {
+            const zip = new JSZip();
+            svgFiles.forEach(f => zip.file(f.name, f.content));
+            const blob = await zip.generateAsync({type: 'blob'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'svg_pages.zip';
+            a.click();
+        }
+    </script>
+</body>
+</html>

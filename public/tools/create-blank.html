@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create a blank PDF document online in any page size. Choose A4, Letter or custom dimensions. Free and instant.">
+    <title>Create Blank PDF – New Empty PDF Document Free | 4uPDF</title>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://4updf-all.vercel.app/create-blank" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M8 6h10l6 6v14a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z' fill='%23f59e0b'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root { --bg: #0f172a; --bg-card: #1e293b; --text: #f1f5f9; --accent: #f59e0b; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { width: 100%; max-width: 400px; background: var(--bg-card); padding: 30px; border-radius: 16px; text-align: center; }
+        h2 { margin-top: 0; }
+        
+        .size-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .size-btn { padding: 15px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); cursor: pointer; transition: all 0.2s; }
+        .size-btn.active { border-color: var(--accent); background: rgba(245, 158, 11, 0.1); color: var(--accent); }
+        
+        input { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; text-align: center; font-size: 16px; }
+        .btn { width: 100%; padding: 12px; background: var(--accent); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Create Blank PDF</h2>
+        
+        <div class="size-grid">
+            <div class="size-btn active" onclick="setSize(595, 842, this)">A4</div>
+            <div class="size-btn" onclick="setSize(612, 792, this)">US Letter</div>
+            <div class="size-btn" onclick="setSize(612, 1008, this)">Legal</div>
+            <div class="size-btn" onclick="setSize(720, 720, this)">Square</div>
+        </div>
+        
+        <input type="number" id="numPages" value="1" min="1" placeholder="Number of Pages">
+        
+        <button class="btn" onclick="create()">Create PDF</button>
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        let selectedW = 595.28, selectedH = 841.89; // A4 default
+
+        window.setSize = (w, h, el) => {
+            selectedW = w;
+            selectedH = h;
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        };
+
+        async function create() {
+            const num = parseInt(document.getElementById('numPages').value);
+            const pdfDoc = await PDFDocument.create();
+            
+            for(let i=0; i<num; i++) pdfDoc.addPage([selectedW, selectedH]);
+            
+            const pdfBytes = await pdfDoc.save();
+            download(pdfBytes, "blank.pdf");
+        }
+
+        function download(data, name) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data]));
+            a.download = name;
+            a.click();
+        }
+    </script>
+</body>
+</html>
