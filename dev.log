@@ -1,0 +1,27 @@
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.19.82:3000
+- Environments: .env
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1394ms
+○ Compiling / ...
+ GET / 200 in 4.3s (compile: 2.7s, render: 1534ms)
+ GET / 200 in 181ms (compile: 3ms, render: 178ms)
+ GET / 200 in 953ms (compile: 3ms, render: 950ms)
+ GET / 200 in 701ms (compile: 4ms, render: 697ms)
+ GET / 200 in 1221ms (compile: 3ms, render: 1219ms)
+✓ Compiled in 258ms
+✓ Compiled in 148ms
+ GET / 200 in 542ms (compile: 53ms, render: 489ms)
+✓ Compiled in 157ms
+⚠ Cross origin request detected from preview-chat-4c5a503f-a1e4-4967-a9fb-cce7594340c3.space-z.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+✓ Compiled in 657ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 350ms (compile: 48ms, render: 302ms)
